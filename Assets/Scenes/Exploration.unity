@@ -246,6 +246,37 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
+--- !u!1 &517842550
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 517842551}
+  m_Layer: 0
+  m_Name: Rooms
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &517842551
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 517842550}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1357921580}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1264506342
 GameObject:
   m_ObjectHideFlags: 0
@@ -412,7 +443,8 @@ Transform:
   m_LocalPosition: {x: 8.98831, y: -0, z: 0.31425}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 517842551}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1357921581
@@ -439,6 +471,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 52edd211f71ee354b9dc962f5a861950, type: 2}
   - {fileID: 11400000, guid: f39a41e9d5397ef42a67dd1dc45577c4, type: 2}
   - {fileID: 11400000, guid: 3559b5716967fa44e95fb342283a109a, type: 2}
+  RoomPrefab: {fileID: 1833549538281250184, guid: 231aed173e3619349ae1e27e319dfb19, type: 3}
+  Where: {fileID: 517842551}
   RoomScale: {x: 1, y: 1}
   RoomCount: {x: 5, y: 5}
   TilePerRoom: {x: 16, y: 16}
