@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f85284219cc7e34398cba0e4513a8b9, type: 3}
+  m_Name: CornerEmpty
+  m_EditorClassIdentifier: Assembly-CSharp::MeshTileGroup
+  TopLeft: 1
+  TopRight: 0
+  BottomLeft: 1
+  BottomRight: 1
+  Models:
+  - {fileID: -6685566314883645473, guid: 68514c5234b60cc48a75ad999a72860c, type: 3}
+  - {fileID: -6639918132430333596, guid: 4899a503c68be0740a4c01a67faea1b7, type: 3}
+  - {fileID: -7209677664115063396, guid: 943f78268a2e2ba4a811bba87a1b2e9f, type: 3}
+  - {fileID: 6376372102365977747, guid: 0986694d187453244ae13f697ba8544f, type: 3}

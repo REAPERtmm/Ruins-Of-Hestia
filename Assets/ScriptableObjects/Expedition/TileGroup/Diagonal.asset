@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f85284219cc7e34398cba0e4513a8b9, type: 3}
+  m_Name: Diagonal
+  m_EditorClassIdentifier: Assembly-CSharp::MeshTileGroup
+  TopLeft: 1
+  TopRight: 0
+  BottomLeft: 0
+  BottomRight: 1
+  Models:
+  - {fileID: 8394065172370901602, guid: eb64039826a25984fa52400d495cfbac, type: 3}
+  - {fileID: 8486298705530195707, guid: 7383607974ae368498a2fdc31c8d6314, type: 3}
