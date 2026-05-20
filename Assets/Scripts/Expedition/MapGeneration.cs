@@ -105,6 +105,10 @@ public class MapGeneration : MonoBehaviour
     [SerializeField] GameObject RoomPrefab;
     [SerializeField] Transform Where;
 
+    [Header("Water")]
+    [SerializeField] GameObject WaterObject;
+    [SerializeField] int TilingPerRoom;
+
     [Header("Parameters")]
     [SerializeField] Vector2 RoomScale;
     [SerializeField] Vector2Int RoomCount;
@@ -232,8 +236,64 @@ public class MapGeneration : MonoBehaviour
         }
     }
 
+    void GenerateWaterMesh()
+    {
+        Mesh mesh = new Mesh();
+
+        int SIZE_X = RoomCount.x * TilingPerRoom;
+        int SIZE_Y = RoomCount.y * TilingPerRoom;
+        int bufferSize = SIZE_X * SIZE_Y;
+        Vector3[] Vertices = new Vector3[bufferSize];
+        Vector2[] UV = new Vector2[bufferSize];
+        Vector3[] Normal = new Vector3[bufferSize];
+        List<int> indices = new List<int>();
+
+        int bufferIndex = 0;
+        for (int x = 0; x < SIZE_X; ++x)
+        {
+            for (int y = 0; y < SIZE_Y; y++)
+            {
+                float Normalized_x = (float)x / (float)(SIZE_X - 1);
+                float Normalized_y = (float)y / (float)(SIZE_Y - 1);
+
+                Vertices[bufferIndex] = new Vector3(Normalized_x * RoomScale.x * RoomCount.x, 0, Normalized_y * RoomScale.y * RoomCount.y);
+                UV[bufferIndex] = new Vector2(Normalized_x, Normalized_y);
+                Normal[bufferIndex] = new Vector3(0, 1, 0);
+
+                int currentIndex = bufferIndex;
+                int NextLineIndex = bufferIndex + SIZE_X;
+                bufferIndex++;
+                if (x == SIZE_X - 1 || y == SIZE_Y - 1) continue;
+
+                // TODO register indices
+                indices.Add(currentIndex);
+                indices.Add(currentIndex + 1);
+                indices.Add(NextLineIndex);
+                indices.Add(currentIndex + 1);
+                indices.Add(NextLineIndex + 1);
+                indices.Add(NextLineIndex);
+            }
+        }
+
+        mesh.SetVertices(Vertices);
+        mesh.SetUVs(0, UV);
+        mesh.SetNormals(Normal);
+        mesh.SetIndices(indices, MeshTopology.Triangles, 0);
+
+        WaterObject.GetComponent<MeshFilter>().sharedMesh = mesh;
+
+        const float OverScaling = 1.5f;
+        float OverflowX = RoomCount.x * RoomScale.x * (OverScaling - 1.0f);
+        float OverflowY = RoomCount.y * RoomScale.y * (OverScaling - 1.0f);
+
+        WaterObject.transform.position = new Vector3(-OverflowX * 0.5f, -0.1f, -OverflowY * 0.5f);
+        WaterObject.transform.localScale = new Vector3(OverScaling, 1.0f, OverScaling);
+    }
+
     private void Start()
     {
+        GenerateWaterMesh();
+
         Raws = new List<RawRoom>();
 
         foreach(var room in Rooms)
