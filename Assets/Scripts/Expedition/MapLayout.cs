@@ -34,7 +34,7 @@ public struct LayoutLinking
     }
 }
 
-class MapLayout
+public class MapLayout
 {
     public Vector2Int MapSize;
     public LayoutLinking[,] Layout;

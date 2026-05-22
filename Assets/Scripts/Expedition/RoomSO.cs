@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 
 
 [CreateAssetMenu(menuName = "ScriptableObject/Room")]
-class RoomSO : ScriptableObject
+public class RoomSO : ScriptableObject
 {
     public Vector2Int Size = new Vector2Int(0, 0);
     public bool[] Terrain = null;

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -93,47 +94,43 @@ public class Room
         GeneratedMesh = new Mesh();
         GeneratedMesh.indexFormat = IndexFormat.UInt32;
         GeneratedMesh.CombineMeshes(combineInstances.ToArray(), true, true);
-
+        GeneratedMesh.Optimize();
+        GeneratedMesh.OptimizeIndexBuffers();
+        GeneratedMesh.OptimizeReorderVertexBuffer();
     }
 }
 
-public class MapGeneration : MonoBehaviour
+public class MapFactory
 {
-    [Header("References")]
-    [SerializeField] MeshTileGroup[] TilesGroups;
-    [SerializeField] RoomSO[] Rooms;
-    [SerializeField] GameObject RoomPrefab;
-    [SerializeField] Transform Where;
+    public int Seed = -1;
 
-    [Header("Water")]
-    [SerializeField] GameObject WaterObject;
-    [SerializeField] int TilingPerRoom;
+    public Vector2 RoomScale;
+    public Vector2Int RoomCount;
+    public Vector2Int TilePerRoom;
+    public int WaterTilingPerRoom;
 
-    [Header("Parameters")]
-    [SerializeField] Vector2 RoomScale;
-    [SerializeField] Vector2Int RoomCount;
-    [SerializeField] Vector2Int TilePerRoom;
-
-    Vector2Int TileGroupPerRoom { get { return TilePerRoom + Vector2Int.one; }  }
-    Vector2 TileScale { get { return new Vector2(RoomScale.x / (float)(TilePerRoom.x), RoomScale.y / (float)(TilePerRoom.y)); }  }
-    Vector2 TileGroupScale { get { return new Vector2(RoomScale.x / (float)(TileGroupPerRoom.x), RoomScale.y / (float)(TileGroupPerRoom.y)); }  }
-
-    float RoomScaleX { get { return RoomScale.x / TileGroupPerRoom.x; } }
-    float RoomScaleZ { get { return RoomScale.y / TileGroupPerRoom.y; } }
+    public Vector2Int TileGroupPerRoom { get { return TilePerRoom + Vector2Int.one; } }
+    public Vector2 TileScale { get { return new Vector2(RoomScale.x / (float)(TilePerRoom.x), RoomScale.y / (float)(TilePerRoom.y)); } }
+    public Vector2 TileGroupScale { get { return new Vector2(RoomScale.x / (float)(TileGroupPerRoom.x), RoomScale.y / (float)(TileGroupPerRoom.y)); } }
+    public float RoomScaleX { get { return RoomScale.x / TileGroupPerRoom.x; } }
+    public float RoomScaleZ { get { return RoomScale.y / TileGroupPerRoom.y; } }
 
     List<RawRoom> Raws;
     RoomResolver ResolverRoom;
     TileGroupResolver ResolverTileGroup;
     Room[,] Map;
     MapLayout Layout;
-    Transform[,] RoomObjects;
 
-    RawRoom RoomSOToRawRoom(RoomSO room)
+    public Mesh WaterMesh = null;
+
+    public Room GetRoom(int x, int y) => Map[x, y];
+
+    static RawRoom RoomSOToRawRoom(RoomSO room)
     {
         // TODO : Allow for different resolution of room
 
         RawRoom output = new RawRoom(room.Size);
-        for(int x = 0; x < room.Size.x; x++)
+        for (int x = 0; x < room.Size.x; x++)
         {
             for (int y = 0; y < room.Size.y; y++)
             {
@@ -144,24 +141,12 @@ public class MapGeneration : MonoBehaviour
         return output;
     }
 
-    Transform CreateRoom(Room room, int x_room, int y_room)
-    {
-        GameObject instance = Instantiate(RoomPrefab, Where);
-        instance.GetComponent<MeshFilter>().sharedMesh = Map[x_room, y_room].GeneratedMesh;
-
-        float scaleY = (RoomScaleX + RoomScaleZ) * 0.5f;
-        instance.transform.localScale = new Vector3(RoomScaleX, scaleY, RoomScaleZ);
-        instance.transform.position = new Vector3(RoomScale.x * x_room, 0.0f, RoomScale.y * y_room);
-
-        return instance.transform;
-    }
-
     void CreateDoor(int x, int y, out bool[] left, out bool[] right, out bool[] top, out bool[] bottom)
     {
-        left    = new bool[TilePerRoom.y];
-        right   = new bool[TilePerRoom.y];
-        top     = new bool[TilePerRoom.x];
-        bottom  = new bool[TilePerRoom.x];
+        left = new bool[TilePerRoom.y];
+        right = new bool[TilePerRoom.y];
+        top = new bool[TilePerRoom.x];
+        bottom = new bool[TilePerRoom.x];
 
         int firstLeft = TilePerRoom.y;
         int lastLeft = 0;
@@ -177,8 +162,8 @@ public class MapGeneration : MonoBehaviour
 
             if (currentRoomLeft || otherRoomLeft)
             {
-                lastLeft = i; 
-                if(firstLeft > i)
+                lastLeft = i;
+                if (firstLeft > i)
                 {
                     firstLeft = i;
                 }
@@ -195,11 +180,11 @@ public class MapGeneration : MonoBehaviour
         }
         for (int i = 0; i < TilePerRoom.y; i++)
         {
-            if(i >= firstLeft && i <= lastLeft) left[i] = true;
-            if(i >= firstRight && i <= lastRight) right[i] = true;
+            if (i >= firstLeft && i <= lastLeft) left[i] = true;
+            if (i >= firstRight && i <= lastRight) right[i] = true;
         }
 
-            int firstTop = TilePerRoom.x;
+        int firstTop = TilePerRoom.x;
         int lastTop = 0;
         int firstBottom = TilePerRoom.x;
         int lastBottom = 0;
@@ -238,10 +223,10 @@ public class MapGeneration : MonoBehaviour
 
     void GenerateWaterMesh()
     {
-        Mesh mesh = new Mesh();
+        WaterMesh = new Mesh();
 
-        int SIZE_X = RoomCount.x * TilingPerRoom;
-        int SIZE_Y = RoomCount.y * TilingPerRoom;
+        int SIZE_X = RoomCount.x * WaterTilingPerRoom;
+        int SIZE_Y = RoomCount.y * WaterTilingPerRoom;
         int bufferSize = SIZE_X * SIZE_Y;
         Vector3[] Vertices = new Vector3[bufferSize];
         Vector2[] UV = new Vector2[bufferSize];
@@ -275,28 +260,24 @@ public class MapGeneration : MonoBehaviour
             }
         }
 
-        mesh.SetVertices(Vertices);
-        mesh.SetUVs(0, UV);
-        mesh.SetNormals(Normal);
-        mesh.SetIndices(indices, MeshTopology.Triangles, 0);
-
-        WaterObject.GetComponent<MeshFilter>().sharedMesh = mesh;
-
-        const float OverScaling = 1.5f;
-        float OverflowX = RoomCount.x * RoomScale.x * (OverScaling - 1.0f);
-        float OverflowY = RoomCount.y * RoomScale.y * (OverScaling - 1.0f);
-
-        WaterObject.transform.position = new Vector3(-OverflowX * 0.5f, -0.1f, -OverflowY * 0.5f);
-        WaterObject.transform.localScale = new Vector3(OverScaling, 1.0f, OverScaling);
+        WaterMesh.SetVertices(Vertices);
+        WaterMesh.SetUVs(0, UV);
+        WaterMesh.SetNormals(Normal);
+        WaterMesh.SetIndices(indices, MeshTopology.Triangles, 0);
     }
 
-    private void Start()
-    {
+    public void Generate(MeshTileGroup[] meshTileGroups, RoomSO[] rooms) 
+    { 
+        if(Seed != -1)
+        {
+            Random.InitState(Seed);
+        }
+
         GenerateWaterMesh();
 
         Raws = new List<RawRoom>();
 
-        foreach(var room in Rooms)
+        foreach (var room in rooms)
         {
             if (room.Size != TilePerRoom) continue;
             RawRoom raw = RoomSOToRawRoom(room);
@@ -307,22 +288,21 @@ public class MapGeneration : MonoBehaviour
         ResolverRoom.Process(Raws, TilePerRoom);
 
         ResolverTileGroup = new TileGroupResolver();
-        ResolverTileGroup.Process(TilesGroups);
+        ResolverTileGroup.Process(meshTileGroups);
 
         Layout = new MapLayout(RoomCount);
         while (Layout.Solve() == false) { }
 
         Map = new Room[RoomCount.x, RoomCount.y];
-        RoomObjects = new Transform[RoomCount.x, RoomCount.y];
 
         // TODO : Compute Real Doors
         bool[] default_door_x = new bool[TileGroupPerRoom.x];
         bool[] default_door_y = new bool[TileGroupPerRoom.y];
 
-        for(int i = 0; i < TileGroupPerRoom.x; i++) default_door_x[i] = true;
-        for(int i = 0; i < TileGroupPerRoom.y; i++) default_door_y[i] = true;
+        for (int i = 0; i < TileGroupPerRoom.x; i++) default_door_x[i] = true;
+        for (int i = 0; i < TileGroupPerRoom.y; i++) default_door_y[i] = true;
 
-        for(int x = 0; x < RoomCount.x; ++x)
+        for (int x = 0; x < RoomCount.x; ++x)
         {
             for (int y = 0; y < RoomCount.y; ++y)
             {
@@ -343,101 +323,171 @@ public class MapGeneration : MonoBehaviour
 
                 Map[x, y].GenerateDualGridWithDoors(LeftDoor, RightDoor, TopDoor, BottomDoor);
                 Map[x, y].GenerateMeshWithResolver(ResolverTileGroup);
-                RoomObjects[x, y] = CreateRoom(Map[x, y], x, y);
             }
         }
     }
+} 
 
-    private void Update()
+public class MapGeneration : MonoBehaviour
+{
+    [Header("References")]
+    [SerializeField] MeshTileGroup[] TilesGroups;
+    [SerializeField] RoomSO[] Rooms;
+    [SerializeField] GameObject RoomPrefab;
+    [SerializeField] Transform Where;
+    [SerializeField] Transform Boudaries;
+
+    [Header("Water")]
+    [SerializeField] GameObject WaterObject;
+    [SerializeField] int TilingPerRoom;
+
+    [Header("Parameters")]
+    [SerializeField] Vector2 RoomScale;
+    [SerializeField] Vector2Int RoomCount;
+    [SerializeField] Vector2Int TilePerRoom;
+
+    MapFactory Factory;
+
+    Transform[,] RoomObjects;
+
+    Transform CreateRoom(Room room, int x_room, int y_room)
     {
+        GameObject instance = Instantiate(RoomPrefab, Where);
+        instance.GetComponent<MeshFilter>().sharedMesh = Factory.GetRoom(x_room, y_room).GeneratedMesh;
+        instance.GetComponent<MeshCollider>().sharedMesh = Factory.GetRoom(x_room, y_room).GeneratedMesh;
 
+        float scaleY = (Factory.RoomScaleX + Factory.RoomScaleZ) * 0.5f;
+        instance.transform.localScale = new Vector3(Factory.RoomScaleX, scaleY, Factory.RoomScaleZ);
+        instance.transform.position = new Vector3(RoomScale.x * x_room, 0.0f, RoomScale.y * y_room);
+
+        return instance.transform;
     }
 
-    private void OnDrawGizmos()
+    private void Start()
     {
-        return;
-        if (Layout == null || Map == null) return;
+        Factory = new MapFactory();
+        Factory.RoomCount = RoomCount;
+        Factory.RoomScale = RoomScale;
+        Factory.TilePerRoom = TilePerRoom;
+        Factory.WaterTilingPerRoom = TilingPerRoom;
 
-        Vector3 RoomSize = new Vector3(1.0f, 0.0f, 1.0f);
-        Vector3 TileGroupSize = new Vector3(RoomSize.x / (float)TileGroupPerRoom.x, 0.0f, RoomSize.z / (float)TileGroupPerRoom.y);
-        Vector3 TileSize = TileGroupSize * 0.5f;
+        Factory.Generate(TilesGroups, Rooms);
 
-        for (int x = 0; x < RoomCount.x; x++) {
-            for (int y = 0; y < RoomCount.y; y++)
-            {
-                Vector3 roomBottomLeft = new Vector3(x, 0, y);
-                if(Layout.StartingPoint.x == x && Layout.StartingPoint.y == y)
-                {
-                    Gizmos.color = Color.green;
-                }
-                else if(Layout.EndingPoint.x == x && Layout.EndingPoint.y == y)
-                {
-                    Gizmos.color = Color.yellow;
-                }
-                else Gizmos.color = Color.white;
+        // Water Object :
+        WaterObject.GetComponent<MeshFilter>().sharedMesh = Factory.WaterMesh;
 
-                Vector3 roomCenter = roomBottomLeft + RoomSize * 0.5f;
-                Gizmos.DrawCube(roomCenter + Vector3.down * 0.1f, RoomSize + Vector3.up * 0.2f);
+        const float OverScaling = 1.5f;
+        float OverflowX = Factory.RoomCount.x * Factory.RoomScale.x * (OverScaling - 1.0f);
+        float OverflowY = Factory.RoomCount.y * Factory.RoomScale.y * (OverScaling - 1.0f);
 
-                for (int x_tile = 0; x_tile < TileGroupPerRoom.x; ++x_tile)
-                {
-                    for (int y_tile = 0; y_tile < TileGroupPerRoom.y; ++y_tile)
-                    {
-                        Vector3 TileBottomLeft = roomBottomLeft + new Vector3(TileGroupSize.x * x_tile, 0.0f, TileGroupSize.z * y_tile);   
+        float ScaleY = (Factory.RoomScale.x + Factory.RoomScale.y) * 0.5f;
 
-                        Gizmos.color = Color.red;
-                        Gizmos.DrawWireCube(TileBottomLeft + TileGroupSize * 0.5f, TileGroupSize + Vector3.up * 0.01f);
+        WaterObject.transform.position = new Vector3(-OverflowX * 0.5f, -0.05f * ScaleY, -OverflowY * 0.5f);
+        WaterObject.transform.localScale = new Vector3(OverScaling, 1.0f, OverScaling);
 
-                        Gizmos.color = Color.blue;
-                        if (Map[x, y].DualGrid[x_tile, y_tile].BL)
-                        {
-                            Gizmos.DrawCube(TileBottomLeft + new Vector3(0.5f * TileSize.x, 0.0f, 0.5f * TileSize.z), TileSize + Vector3.up * 0.01f);
-                        }
-                        if (Map[x, y].DualGrid[x_tile, y_tile].BR)
-                        {
-                            Gizmos.DrawCube(TileBottomLeft + new Vector3(1.5f * TileSize.x, 0.0f, 0.5f * TileSize.z), TileSize + Vector3.up * 0.01f);
-                        }
-                        if (Map[x, y].DualGrid[x_tile, y_tile].TL)
-                        {
-                            Gizmos.DrawCube(TileBottomLeft + new Vector3(0.5f * TileSize.x, 0.0f, 1.5f * TileSize.z), TileSize + Vector3.up * 0.01f);
-                        }
-                        if (Map[x, y].DualGrid[x_tile, y_tile].TR)
-                        {
-                            Gizmos.DrawCube(TileBottomLeft + new Vector3(1.5f * TileSize.x, 0.0f, 1.5f * TileSize.z), TileSize + Vector3.up * 0.01f);
-                        }
-                    }
-                }
+        // Room Objects :
+        RoomObjects = new Transform[RoomCount.x, RoomCount.y];
 
-
-            }
-        }
-
-        for (int x = 0; x < RoomCount.x; x++)
+        for (int x = 0; x < RoomCount.x; ++x)
         {
-            for (int y = 0; y < RoomCount.y; y++)
+            for (int y = 0; y < RoomCount.y; ++y)
             {
-                Vector3 roomCenter = new Vector3(x, 0, y) + RoomSize * 0.5f;
-
-                Gizmos.color = Color.white;
-                if (Layout.Layout[x, y].Up)
-                {
-                    Gizmos.DrawCube(roomCenter + Vector3.up * 0.2f + Vector3.forward * 0.25f, new Vector3(0.1f, 0.1f, 0.5f));
-                }
-                if (Layout.Layout[x, y].Down)
-                {
-                    Gizmos.DrawCube(roomCenter + Vector3.up * 0.2f + Vector3.back * 0.25f, new Vector3(0.1f, 0.1f, 0.5f));
-                }
-                if (Layout.Layout[x, y].Left)
-                {
-                    Gizmos.DrawCube(roomCenter + Vector3.up * 0.2f + Vector3.left * 0.25f, new Vector3(0.5f, 0.1f, 0.1f));
-                }
-                if (Layout.Layout[x, y].Right)
-                {
-                    Gizmos.DrawCube(roomCenter + Vector3.up * 0.2f + Vector3.right * 0.25f, new Vector3(0.5f, 0.1f, 0.1f));
-                }
+                RoomObjects[x, y] = CreateRoom(Factory.GetRoom(x, y), x, y);
             }
         }
 
+        // Camera Boudaries :
+        Vector3 size = new Vector3(2.0f * Factory.RoomScale.x * Factory.RoomCount.x, 1000.0f, 2.0f * Factory.RoomScale.y * Factory.RoomCount.y);
+        Boudaries.GetComponent<BoxCollider>().size = size;
+        Boudaries.transform.position = size * 0.25f + Vector3.down * 100.0f;
+
+
     }
+
+    //private void OnDrawGizmos()
+    //{
+    //    if (Layout == null || Map == null) return;
+
+    //    Vector3 RoomSize = new Vector3(1.0f, 0.0f, 1.0f);
+    //    Vector3 TileGroupSize = new Vector3(RoomSize.x / (float)TileGroupPerRoom.x, 0.0f, RoomSize.z / (float)TileGroupPerRoom.y);
+    //    Vector3 TileSize = TileGroupSize * 0.5f;
+
+    //    for (int x = 0; x < RoomCount.x; x++) {
+    //        for (int y = 0; y < RoomCount.y; y++)
+    //        {
+    //            Vector3 roomBottomLeft = new Vector3(x, 0, y);
+    //            if(Layout.StartingPoint.x == x && Layout.StartingPoint.y == y)
+    //            {
+    //                Gizmos.color = Color.green;
+    //            }
+    //            else if(Layout.EndingPoint.x == x && Layout.EndingPoint.y == y)
+    //            {
+    //                Gizmos.color = Color.yellow;
+    //            }
+    //            else Gizmos.color = Color.white;
+
+    //            Vector3 roomCenter = roomBottomLeft + RoomSize * 0.5f;
+    //            Gizmos.DrawCube(roomCenter + Vector3.down * 0.1f, RoomSize + Vector3.up * 0.2f);
+
+    //            for (int x_tile = 0; x_tile < TileGroupPerRoom.x; ++x_tile)
+    //            {
+    //                for (int y_tile = 0; y_tile < TileGroupPerRoom.y; ++y_tile)
+    //                {
+    //                    Vector3 TileBottomLeft = roomBottomLeft + new Vector3(TileGroupSize.x * x_tile, 0.0f, TileGroupSize.z * y_tile);   
+
+    //                    Gizmos.color = Color.red;
+    //                    Gizmos.DrawWireCube(TileBottomLeft + TileGroupSize * 0.5f, TileGroupSize + Vector3.up * 0.01f);
+
+    //                    Gizmos.color = Color.blue;
+    //                    if (Map[x, y].DualGrid[x_tile, y_tile].BL)
+    //                    {
+    //                        Gizmos.DrawCube(TileBottomLeft + new Vector3(0.5f * TileSize.x, 0.0f, 0.5f * TileSize.z), TileSize + Vector3.up * 0.01f);
+    //                    }
+    //                    if (Map[x, y].DualGrid[x_tile, y_tile].BR)
+    //                    {
+    //                        Gizmos.DrawCube(TileBottomLeft + new Vector3(1.5f * TileSize.x, 0.0f, 0.5f * TileSize.z), TileSize + Vector3.up * 0.01f);
+    //                    }
+    //                    if (Map[x, y].DualGrid[x_tile, y_tile].TL)
+    //                    {
+    //                        Gizmos.DrawCube(TileBottomLeft + new Vector3(0.5f * TileSize.x, 0.0f, 1.5f * TileSize.z), TileSize + Vector3.up * 0.01f);
+    //                    }
+    //                    if (Map[x, y].DualGrid[x_tile, y_tile].TR)
+    //                    {
+    //                        Gizmos.DrawCube(TileBottomLeft + new Vector3(1.5f * TileSize.x, 0.0f, 1.5f * TileSize.z), TileSize + Vector3.up * 0.01f);
+    //                    }
+    //                }
+    //            }
+
+
+    //        }
+    //    }
+
+    //    for (int x = 0; x < RoomCount.x; x++)
+    //    {
+    //        for (int y = 0; y < RoomCount.y; y++)
+    //        {
+    //            Vector3 roomCenter = new Vector3(x, 0, y) + RoomSize * 0.5f;
+
+    //            Gizmos.color = Color.white;
+    //            if (Layout.Layout[x, y].Up)
+    //            {
+    //                Gizmos.DrawCube(roomCenter + Vector3.up * 0.2f + Vector3.forward * 0.25f, new Vector3(0.1f, 0.1f, 0.5f));
+    //            }
+    //            if (Layout.Layout[x, y].Down)
+    //            {
+    //                Gizmos.DrawCube(roomCenter + Vector3.up * 0.2f + Vector3.back * 0.25f, new Vector3(0.1f, 0.1f, 0.5f));
+    //            }
+    //            if (Layout.Layout[x, y].Left)
+    //            {
+    //                Gizmos.DrawCube(roomCenter + Vector3.up * 0.2f + Vector3.left * 0.25f, new Vector3(0.5f, 0.1f, 0.1f));
+    //            }
+    //            if (Layout.Layout[x, y].Right)
+    //            {
+    //                Gizmos.DrawCube(roomCenter + Vector3.up * 0.2f + Vector3.right * 0.25f, new Vector3(0.5f, 0.1f, 0.1f));
+    //            }
+    //        }
+    //    }
+
+    //}
 
 }

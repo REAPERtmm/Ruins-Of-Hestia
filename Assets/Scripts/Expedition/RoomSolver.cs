@@ -89,8 +89,8 @@ public class RawRoom
 
         RawRoom raw = new RawRoom(RotateSize(rotation));
 
-        float half_x = (Size.x - 1) * 0.5f;
-        float half_y = (Size.y - 1) * 0.5f;
+        float half_x = (float)(Size.x - 1) * 0.5f;
+        float half_y = (float)(Size.y - 1) * 0.5f;
 
         for (int x = 0; x < Size.x; x++) {
             for (int y = 0; y < Size.y; y++)
@@ -99,8 +99,8 @@ public class RawRoom
                 float centered_y = (float)y - half_y;
 
                 Vector2Int new_coord = new Vector2Int(
-                    (int)(centered_x * matrix[0, 0] + centered_y * matrix[0, 1] + half_x),
-                    (int)(centered_x * matrix[1, 0] + centered_y * matrix[1, 1] + half_y)
+                    Mathf.RoundToInt(centered_x * matrix[0, 0] + centered_y * matrix[0, 1] + half_x),
+                    Mathf.RoundToInt(centered_x * matrix[1, 0] + centered_y * matrix[1, 1] + half_y)
                 );
 
                 raw.Tiles[new_coord.x, new_coord.y] = Tiles[x, y];
