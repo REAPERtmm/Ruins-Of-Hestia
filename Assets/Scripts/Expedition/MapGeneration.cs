@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.UIElements;
+using UnityEngine.UI;
 
 public class Room
 {
@@ -338,8 +338,9 @@ public class MapFactory
         }
 
     }
-} 
+}
 
+[ExecuteAlways]
 public class MapGeneration : MonoBehaviour
 {
     [Header("References")]
@@ -347,6 +348,7 @@ public class MapGeneration : MonoBehaviour
     [SerializeField] RoomSO[] Rooms;
     [SerializeField] Transform Boudaries;
     [SerializeField] Transform Player;
+    [SerializeField] RawImage MiniMapImage;
 
     [Header("Prefabs")]
     [SerializeField] GameObject RoomPrefab;
@@ -367,9 +369,12 @@ public class MapGeneration : MonoBehaviour
 
     [Header("Debug")]
     [SerializeField] bool DebugTiles;
+    [SerializeField] bool GENERATE;
+    [SerializeField] bool DESTROY;
+    [SerializeField] int Seed = -1;
+    [SerializeField] Texture2D MiniMap;
 
-    MapFactory Factory;
-
+    MapFactory Factory = null;
     Transform[,] RoomObjects;
 
     Transform CreateRoom(Room room, int x_room, int y_room)
@@ -393,7 +398,7 @@ public class MapGeneration : MonoBehaviour
         float random_offset_y = Random.Range(-Factory.TileGroupScale.y, Factory.TileGroupScale.y) * 0.35f;
         Vector3 random_offset = new Vector3(random_offset_x, 0, random_offset_y);
 
-        instance.transform.position = position + Vector3.up * instance.transform.localScale.y * 0.5f + random_offset;
+        instance.transform.position = position + random_offset;
         return instance.transform;
     }
 
@@ -405,13 +410,56 @@ public class MapGeneration : MonoBehaviour
         float random_offset_y = Random.Range(-Factory.TileGroupScale.y, Factory.TileGroupScale.y) * 0.35f;
         Vector3 random_offset = new Vector3(random_offset_x, 0, random_offset_y);
 
-        instance.transform.position = position + Vector3.up * instance.transform.localScale.y * 0.5f + random_offset;
+        instance.transform.position = position + random_offset;
         return instance.transform;
     }
 
-    private void Start()
+    public void GenerateMiniMapTemp()
+    {
+        int width = RoomCount.x * Factory.TileGroupPerRoom.x * 2;
+        int height = RoomCount.y * Factory.TileGroupPerRoom.y * 2;
+        MiniMap = new Texture2D(width, height, TextureFormat.RGBA32, false);
+        MiniMap.filterMode = FilterMode.Point;
+        MiniMap.wrapMode = TextureWrapMode.Clamp;
+        MiniMap.anisoLevel = 0;
+
+        Color TERRAIN = Color.white;
+        Color WATER = new Color(0, 0, 0, 0);
+
+        for (int x_room = 0; x_room < RoomCount.x; x_room++) {
+            for (int y_room = 0; y_room < RoomCount.y; y_room++) {
+
+                int X = x_room * Factory.TileGroupPerRoom.x * 2; 
+                int Y = y_room * Factory.TileGroupPerRoom.y * 2; 
+                Room ROOM = Factory.GetRoom(x_room, y_room);
+
+                for (int x_tileGroup = 0; x_tileGroup < Factory.TileGroupPerRoom.x; x_tileGroup++)
+                {
+                    for (int y_tileGroup = 0; y_tileGroup < Factory.TileGroupPerRoom.y; y_tileGroup++)
+                    {
+                        int X2 = X + x_tileGroup * 2;
+                        int Y2 = Y + y_tileGroup * 2;
+                        var TILE_GROUP = ROOM.DualGrid[x_tileGroup, y_tileGroup];
+
+                        MiniMap.SetPixel(X2, Y2, TILE_GROUP.BL ? TERRAIN : WATER);
+                        MiniMap.SetPixel(X2 + 1, Y2, TILE_GROUP.BR ? TERRAIN : WATER);
+                        MiniMap.SetPixel(X2, Y2 + 1, TILE_GROUP.TL ? TERRAIN : WATER);
+                        MiniMap.SetPixel(X2 + 1, Y2 + 1, TILE_GROUP.TR ? TERRAIN : WATER);
+                    }
+                }
+
+            }
+        }
+        MiniMap.Apply(false, false);
+
+        MiniMapImage.color = Color.white;
+        MiniMapImage.texture = MiniMap;
+    }
+
+    public void Generate(int seed = -1)
     {
         Factory = new MapFactory();
+        Factory.Seed = seed;
         Factory.RoomCount = RoomCount;
         Factory.RoomScale = RoomScale;
         Factory.TilePerRoom = TilePerRoom;
@@ -441,7 +489,7 @@ public class MapGeneration : MonoBehaviour
                 Room room = Factory.GetRoom(x, y);
                 Vector3 roomPosition = new Vector3(x * RoomScale.x, 0, y * RoomScale.y);
                 RoomObjects[x, y] = CreateRoom(room, x, y);
-                foreach(var ennemi in room.EnnemiSpawns(Factory.RawRoomScale))
+                foreach (var ennemi in room.EnnemiSpawns(Factory.RawRoomScale))
                 {
                     CreateEnnemi(new Vector3(ennemi.x, 0, ennemi.y) + roomPosition + new Vector3(Factory.TileGroupScale.x, 0, Factory.TileGroupScale.y) * 0.5f);
                 }
@@ -459,6 +507,50 @@ public class MapGeneration : MonoBehaviour
 
         Vector2 start = Factory.StartPosition;
         Player.position = new Vector3(start.x, 0, start.y);
+
+        GenerateMiniMapTemp();
+    }
+
+    public void DestroyGeneration()
+    {
+        while(RoomWhere.childCount > 0)
+        {
+            DestroyImmediate(RoomWhere.GetChild(0).gameObject);
+        }
+        while (ResourceWhere.childCount > 0)
+        {
+            DestroyImmediate(ResourceWhere.GetChild(0).gameObject);
+        } 
+        while (EnnemiWhere.childCount > 0)
+        {
+            DestroyImmediate(EnnemiWhere.GetChild(0).gameObject);
+        }
+        Factory = null;
+    }
+
+    public void Update()
+    {
+        if (GENERATE)
+        {
+            if(Factory != null) DestroyGeneration();
+            Generate(Seed);
+            GENERATE = false;
+        }
+
+        if (DESTROY)
+        {
+            DestroyGeneration();
+            DESTROY = false;
+        }
+    }
+
+    private void Start()
+    {
+        if (Factory == null)
+        {
+            DestroyGeneration();
+            Generate();
+        }
     }
 
 
