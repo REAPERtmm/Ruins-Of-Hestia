@@ -1,10 +1,10 @@
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Assertions.Must;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
+    public static PlayerController INSTANCE;
+
     [Header("References")]
     [SerializeField] Animator CaliAnimator;
 
@@ -31,6 +31,8 @@ public class PlayerController : MonoBehaviour
         ControlMove = InputSystem.actions.FindAction("ExplorationMove");
         characterController = GetComponent<CharacterController>();
         LookingToward = Quaternion.identity;
+        if(INSTANCE == null)
+            INSTANCE = this;
     }
 
     void Update()
@@ -69,7 +71,8 @@ public class PlayerController : MonoBehaviour
         foreach (var hit in hits) { 
             if(hit.collider.tag == "Ground")
             {
-                isGrounded = true; 
+                isGrounded = true;
+                transform.position = hit.point;
                 break;
             }
         }
