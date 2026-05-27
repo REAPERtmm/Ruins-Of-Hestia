@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
@@ -363,6 +364,7 @@ public class MapGeneration : MonoBehaviour
     [SerializeField] RoomSO[] Rooms;
     [SerializeField] Transform Boudaries;
     [SerializeField] Transform Player;
+    [SerializeField] Transform Campfire;
     [SerializeField] RawImage MiniMapImage;
 
     [Header("Prefabs")]
@@ -549,13 +551,16 @@ public class MapGeneration : MonoBehaviour
         Boudaries.transform.position = size * 0.25f + Vector3.down * 100.0f;
 
         Vector2 start = Factory.StartPosition;
+        Vector2 end = Factory.EndPosition;
         Player.position = new Vector3(start.x, 0, start.y);
+        Campfire.position = new Vector3(end.x, 0, end.y);
 
         GenerateMiniMapTemp();
     }
 
     public void DestroyGeneration()
     {
+        if (RoomObjects == null) return;
         for (int x = 0; x < RoomCount.x; ++x)
         {
             for (int y = 0; y < RoomCount.y; ++y)
@@ -609,6 +614,13 @@ public class MapGeneration : MonoBehaviour
         {
             DestroyGeneration();
             DESTROY = false;
+        }
+
+        if (RoomObjects == null) return;
+        if (RoomObjects[0, 0].Terrain.IsDestroyed())
+        {
+            RoomObjects = null;
+            return;
         }
 
         int player_x = (int)(Player.transform.position.x / RoomScale.x);
