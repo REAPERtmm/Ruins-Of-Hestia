@@ -351,6 +351,7 @@ public class MapFactory
 
 public struct RoomObject
 {
+    public Vector2Int RoomPosition;
     public Transform Terrain;
     public Transform Ennemies;
     public Transform Resources;
@@ -359,6 +360,8 @@ public struct RoomObject
 [ExecuteAlways]
 public class MapGeneration : MonoBehaviour
 {
+    public static MapGeneration INSTANCE = null;
+
     [Header("References")]
     [SerializeField] MeshTileGroup[] TilesGroups;
     [SerializeField] RoomSO[] Rooms;
@@ -366,6 +369,7 @@ public class MapGeneration : MonoBehaviour
     [SerializeField] Transform Player;
     [SerializeField] Transform Campfire;
     [SerializeField] RawImage MiniMapImage;
+    [SerializeField] EnnemiManager ManagerEnnemis;
 
     [Header("Prefabs")]
     [SerializeField] Transform RoomWhere;
@@ -384,6 +388,7 @@ public class MapGeneration : MonoBehaviour
 
     [Header("Debug")]
     [SerializeField] bool DebugTiles;
+    [SerializeField] bool DebugEnnemiAI;
     [SerializeField] bool GENERATE;
     [SerializeField] bool DESTROY;
     [SerializeField] int Seed = -1;
@@ -392,6 +397,9 @@ public class MapGeneration : MonoBehaviour
     MapFactory Factory = null;
     RoomObject[,] RoomObjects;
 
+    public bool EnnemiAI { get => DebugEnnemiAI; }
+    public int RoomCountX { get => RoomCount.x; }
+    public int RoomCountY { get => RoomCount.y; }
 
     RoomObject CreateRoom(Room room, int x_room, int y_room)
     {
@@ -423,6 +431,7 @@ public class MapGeneration : MonoBehaviour
         roomObject.Terrain = instance.transform;
         roomObject.Ennemies = EnnemiContainer.transform;
         roomObject.Resources = ResourceContainer.transform;
+        roomObject.RoomPosition = new Vector2Int(x_room, y_room);
 
         return roomObject;
     }
@@ -446,6 +455,12 @@ public class MapGeneration : MonoBehaviour
         float random_offset_x = Random.Range(-Factory.TileGroupScale.x, Factory.TileGroupScale.x) * 0.35f;
         float random_offset_y = Random.Range(-Factory.TileGroupScale.y, Factory.TileGroupScale.y) * 0.35f;
         Vector3 random_offset = new Vector3(random_offset_x, 0, random_offset_y);
+
+        EnnemiController controller = instance.GetComponent<EnnemiController>();
+        CombatController combat = instance.GetComponent<CombatController>();
+
+        controller.InitRoom = obj.RoomPosition;
+        ManagerEnnemis.RegisterEnnemi(combat, controller);
 
         instance.transform.position = position + random_offset;
         return instance.transform;
@@ -556,6 +571,7 @@ public class MapGeneration : MonoBehaviour
         Campfire.position = new Vector3(end.x, 0, end.y);
 
         GenerateMiniMapTemp();
+        ManagerEnnemis.InitWithRegistered();
     }
 
     public void DestroyGeneration()
@@ -583,6 +599,7 @@ public class MapGeneration : MonoBehaviour
             DestroyImmediate(RoomWhere.GetChild(0).gameObject);
         }
 
+        ManagerEnnemis.ForgetEveryRegistered();
         RoomObjects = null;
         Factory = null;
     }
@@ -599,6 +616,15 @@ public class MapGeneration : MonoBehaviour
                 RoomObjects[i, j].Terrain.gameObject.SetActive(dx <= 1 && dy <= 1);
             }
         }
+    }
+    public void OnEnable()
+    {
+        INSTANCE = this;
+    }
+
+    private void OnDisable()
+    {
+        INSTANCE = null;
     }
 
     public void Update()

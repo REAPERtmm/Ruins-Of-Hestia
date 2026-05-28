@@ -4,9 +4,9 @@ using UnityEngine;
 
 public enum EnnemiState : int
 {
-    Idle        = 0,
-    Roaming     = 1,
-    Focus       = 2,
+    Idle = 0,
+    Roaming = 1,
+    Focus = 2,
 }
 
 public class EnnemiController : MonoBehaviour
@@ -16,6 +16,7 @@ public class EnnemiController : MonoBehaviour
     [SerializeField] Transform Model;
     [SerializeField] CapsuleCollider Collider;
     [SerializeField] CharacterController CharController;
+    [SerializeField] CombatController Combat;
     [SerializeField] List<Transform> Targets;
 
     [Header("Parameters")]
@@ -30,6 +31,8 @@ public class EnnemiController : MonoBehaviour
     [SerializeField] float DetectionRadiusIdle;
     [SerializeField] float DetectionRadiusRoaming;
     [SerializeField] float FocusMinDistance;
+
+    public Vector2Int InitRoom;
 
     bool CollideWithEdgeOfMap;
     Vector3 MovementThisFrame;
@@ -111,7 +114,7 @@ public class EnnemiController : MonoBehaviour
 
     void UpdateIdle()
     {
-        foreach(var target in Targets)
+        foreach (var target in Targets)
         {
             float DistanceToTarget = (transform.position - target.position).magnitude;
 
@@ -122,7 +125,7 @@ public class EnnemiController : MonoBehaviour
             }
         }
 
-        if(Time.time - TimeStateStarted > MaxTime)
+        if (Time.time - TimeStateStarted > MaxTime)
         {
             TransitionToRoaming();
             return;
@@ -134,7 +137,7 @@ public class EnnemiController : MonoBehaviour
     {
         Move(RoamingDirection);
 
-        if(CollideWithEdgeOfMap)
+        if (CollideWithEdgeOfMap)
         {
             TransitionToIdle();
             return;
@@ -178,11 +181,20 @@ public class EnnemiController : MonoBehaviour
     private void Start()
     {
         Targets.Add(PlayerController.INSTANCE.transform);
+        // TODO : Add Iris
+
+        PlayerController.INSTANCE.Combat.RegisterTarget(transform);
+
+        for (int i = 0; i < Targets.Count; i++)
+        {
+            Combat.RegisterTarget(Targets[i]);
+        }
     }
 
     private void Update()
     {
-        switch (CurrentState) {
+        switch (CurrentState)
+        {
             default:
             case EnnemiState.Idle: UpdateIdle(); break;
             case EnnemiState.Roaming: UpdateRoaming(); break;
@@ -194,6 +206,7 @@ public class EnnemiController : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        if (MapGeneration.INSTANCE != null && MapGeneration.INSTANCE.EnnemiAI == false) return;
         Color IDLE_COLOR = Color.white;
         Color ROAMING_COLOR = Color.aquamarine;
         Color FOCUS_COLOR = Color.red;

@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("References")]
     [SerializeField] Animator CaliAnimator;
+    [SerializeField] public CombatController Combat;
 
     [Header("Parameters")]
     [SerializeField] float Speed;
