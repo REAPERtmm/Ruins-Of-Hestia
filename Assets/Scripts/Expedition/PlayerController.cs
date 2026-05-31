@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
     [Header("References")]
     [SerializeField] Animator CaliAnimator;
     [SerializeField] public CombatController Combat;
+    [SerializeField] EnnemiManager ManagerEnnemis;
 
     [Header("Parameters")]
     [SerializeField] float Speed;
@@ -36,7 +37,7 @@ public class PlayerController : MonoBehaviour
             INSTANCE = this;
     }
 
-    void Update()
+    void UpdateMovements()
     {
         const float COS45 = 0.70710678f;
         const float SIN45 = 0.70710678f;
@@ -64,27 +65,34 @@ public class PlayerController : MonoBehaviour
                 0,
                 -Velocity.x * SIN45 + Velocity.y * COS45
                 ) * Speed * Time.deltaTime;
-        characterController.Move( movement );
+        characterController.Move(movement);
 
         Ray below = new Ray(transform.position, Vector3.down);
         var hits = Physics.RaycastAll(below, transform.localScale.y * 0.1f);
         bool isGrounded = false;
-        foreach (var hit in hits) { 
-            if(hit.collider.tag == "Ground")
+        foreach (var hit in hits)
+        {
+            if (hit.collider.tag == "Ground")
             {
                 isGrounded = true;
                 transform.position = hit.point;
                 break;
             }
         }
-        if (!isGrounded) {
+        if (!isGrounded)
+        {
             characterController.Move(-movement);
         }
-        else if(Input.x != 0.0f || Input.y != 0.0f)
+        else if (Input.x != 0.0f || Input.y != 0.0f)
         {
             LookingToward = Quaternion.LookRotation(movement, Vector3.up);
             transform.rotation = LookingToward;
         }
+    }
+
+    void Update()
+    {
+        UpdateMovements();
 
     }
 

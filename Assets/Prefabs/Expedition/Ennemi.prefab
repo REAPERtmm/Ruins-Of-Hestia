@@ -111,6 +111,7 @@ MonoBehaviour:
   DetectionRadiusIdle: 10
   DetectionRadiusRoaming: 7
   FocusMinDistance: 12
+  InitRoom: {x: 0, y: 0}
 --- !u!114 &2358279281082916239
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -126,11 +127,18 @@ MonoBehaviour:
   Helmet: {fileID: 0}
   ChestPlate: {fileID: 0}
   Gloves: {fileID: 0}
-  Pants: {fileID: 0}
+  Legs: {fileID: 0}
   Boots: {fileID: 0}
   MeleeWeapon: {fileID: 0}
   DistanceWeapon: {fileID: 0}
   Targets: []
+  MyGroup: 1
+  BaseMaxHP: 20
+  BaseArmor: 0
+  BaseStrength: 1
+  BaseSpeed: 1
+  BaseLuck: 0
+  BaseProvocation: 0
 --- !u!1001 &2272816687197482085
 PrefabInstance:
   m_ObjectHideFlags: 0

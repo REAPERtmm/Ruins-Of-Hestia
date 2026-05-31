@@ -617,6 +617,7 @@ public class MapGeneration : MonoBehaviour
             }
         }
     }
+
     public void OnEnable()
     {
         INSTANCE = this;
@@ -662,7 +663,6 @@ public class MapGeneration : MonoBehaviour
             Generate();
         }
     }
-
 
     private void OnDrawGizmos()
     {

@@ -98,6 +98,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   CaliAnimator: {fileID: 3482686469855565781}
   Combat: {fileID: 8127787276281221390}
+  ManagerEnnemis: {fileID: 0}
   Speed: 12
   Acceleration: 5
 --- !u!114 &8127787276281221390
@@ -112,13 +113,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52e9facb7c543714ab4b406ceeca1fd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CombatController
-  Helmet: {fileID: 0}
+  Helmet: {fileID: 11400000, guid: 3560f78fd8278824db0cfb5ee5d4c098, type: 2}
   ChestPlate: {fileID: 0}
   Gloves: {fileID: 0}
   Pants: {fileID: 0}
   Boots: {fileID: 0}
-  MeleeWeapon: {fileID: 0}
-  DistanceWeapon: {fileID: 0}
+  MeleeWeapon: {fileID: 11400000, guid: 70bfd6d1c0664764796b2e2321133ec2, type: 2}
+  DistanceWeapon: {fileID: 11400000, guid: 61588320c61f6804b8971672603fee73, type: 2}
+  TargetGroup: 1
   Targets: []
 --- !u!1001 &7007153852085201476
 PrefabInstance:
