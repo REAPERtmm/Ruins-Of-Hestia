@@ -1,3 +1,4 @@
+using System;
 using NUnit.Framework;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,45 +11,6 @@ public enum BuildingType
     Forge,
     BuildingTypeCount
 }
-
-public class BuildingFondation
-{
-    public int X;
-    public int Y;
-    public int Width;
-    public int Height;
-
-    public BuildingFondation(int x, int y, int width, int height)
-    {
-        X = x;
-        Y = y;
-        Width = width;
-        Height = height;
-    }
-}
-
-public class BuildingImage
-{
-    public Texture Texture;
-    public Vector3 Offset;
-    public Vector3 Scale;
-
-    public BuildingImage(Texture texture, Vector3 offset, Vector3 scale)
-    {
-        Texture = texture;
-        Offset = offset;
-        Scale = scale;
-    }
-}
-
-public class BuildingInstance
-{
-    public List<BuildingInstance> Holder;
-    public BuildingFondation Fondation;
-    public BuildingImage Image;
-    public int Function;
-}
-
 public class VillageGrid15x15
 {
     public const int GridWidth = 15;
