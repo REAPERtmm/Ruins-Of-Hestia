@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using NUnit.Framework;
 using System;
 using System.Linq;
@@ -29,9 +30,23 @@ public enum StatName
 
 }
 
+[Serializable]
+public enum EquipmentTier
+{
+    Common, 
+    Rare,
+    Epic,
+    Legendary,
+    Mythic
+}
+
 [CreateAssetMenu(fileName = "Equipement", menuName = "ScriptableObject/Equipement")]
 public class Equipement : ScriptableObject
 {
+    [SerializeField] public string EquipmentName;
+
+    [SerializeField] public EquipmentTier Tier;
+
     [SerializeField] public Statistic[] Statistics;
 
     public Statistic GetStatistic(StatName name)

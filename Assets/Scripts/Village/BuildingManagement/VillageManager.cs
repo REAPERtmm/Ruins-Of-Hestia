@@ -11,6 +11,17 @@ public enum BuildingType
     BuildingTypeCount
 }
 
+public enum ResourceType
+{
+    Unknown,
+    Wood,
+    Stone,
+    Metal,
+    Leaves,
+    Food,
+    ResourceTypeCount
+}
+
 public class BuildingFondation
 {
     public int X;
