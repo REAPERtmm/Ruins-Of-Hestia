@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public abstract class Building : MonoBehaviour
+public abstract class BuildingScript : MonoBehaviour
 {
     [SerializeField] private BuildingsUI BuildingUI; 
 

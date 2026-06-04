@@ -19,6 +19,8 @@ public class Tile
 {
     public Vector2 Position;
     public OccupationType Occupation;
+    public BuildingData BuildingData;
+    public BuildingScript BuildingScript;
 }
 
 [System.Serializable]
@@ -103,13 +105,23 @@ public class Grid
         if ( IsOccupied(position, building.Fondation) )
             return false;
 
+        GameObject gameObject = Object.Instantiate(building.Prefab, GridToWorld(position), Quaternion.identity);
+        BuildingScript script = gameObject.GetComponentInChildren<BuildingScript>();
+        BuildingData data = new BuildingData();
+        BuildingPlaced.Add(data);
         for (int x = (int)position.x; x <= position.x + building.Fondation.Width; ++x) {
             for (int y = (int)position.y; y <= position.y + building.Fondation.Height; ++y) {
                 _tiles[x, y].Occupation = OccupationType.Building;
+                _tiles[x, y].BuildingData = data;
+                _tiles[x, y].BuildingScript = script;
             }
         }
-
         return true;
+    }
+
+    public Tile GetTile(Vector2 position)
+    {
+        return _tiles[(int)position.x, (int)position.y];
     }
 
 

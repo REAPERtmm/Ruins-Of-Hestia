@@ -5,7 +5,7 @@ public class ForgeUI : BuildingsUI
     private Forge CurrentForge;
     [SerializeField] private GameObject UiForge;
 
-    public override void Open(Building building)
+    public override void Open(BuildingScript building)
     {
         CurrentForge = (Forge)building;
 

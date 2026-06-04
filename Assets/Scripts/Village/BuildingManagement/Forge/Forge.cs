@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class Forge : Building
+public class Forge : BuildingScript
 {
     [SerializeField] int Level = 1;
 
