@@ -13,7 +13,8 @@ public enum VillageMode
 public class VillageManager : MonoBehaviour
 {
     public List<Building> BuildingObjects = new();
-    public GameObject BuildingsContainer;
+    public Transform BuildingsContainer;
+    public Transform BuildingsUIContainer;
 
     public BuildingScript SelectedBuilding;
 
@@ -31,7 +32,7 @@ public class VillageManager : MonoBehaviour
         Grid.Create();
 
         GameObject container = new GameObject("Templates");
-        container.transform.parent = BuildingsContainer.transform;
+        container.transform.parent = BuildingsContainer;
         for (var i = 0; i < BuildingObjects.Count; i++)
         {
             Building desc = BuildingObjects[i];
@@ -44,17 +45,7 @@ public class VillageManager : MonoBehaviour
 
     private void Update()
     {
-        if (Grid.CursorToGrid(out Vector2 gridPos))
-        {
-            DebugCube.transform.position = Grid.GridToWorld(gridPos);
 
-            if (Mouse.current.leftButton.wasPressedThisFrame)
-            {
-                Grid.PlaceBuilding(gridPos, BuildingObjects[0]);
-                BuildingTemplate[0].SetActive(false);
-                ToViewMode();
-            }
-        }
 
         UpdateView();
 
@@ -98,12 +89,26 @@ public class VillageManager : MonoBehaviour
 
         if (Grid.CursorToGrid(out Vector2 gridPos))
         {
+            // Build preview
             if (!Grid.IsOccupied(gridPos, BuildingObjects[0].Fondation))
             {
                 BuildingTemplate[0].SetActive(true);
                 BuildingTemplate[0].transform.position = new (gridPos.x, 0, gridPos.y);
             }
+
+            // Cursor
+            DebugCube.transform.position = Grid.GridToWorld(gridPos);
+
+            // Placement
+            if (Mouse.current.leftButton.wasPressedThisFrame)
+            {
+                Grid.PlaceBuilding(gridPos, BuildingObjects[0]);
+                Grid.GetTile(gridPos).BuildingScript.Instantiate( BuildingsUIContainer );
+                BuildingTemplate[0].SetActive(false);
+                ToViewMode();
+            }
         }
+
     }
 
     public void ToViewMode() => ChangeMode(VillageMode.View);

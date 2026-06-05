@@ -62,6 +62,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dedaa173d69f7924dafd79e6bbb89df3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Forge
+  BuildingUIPrefab: {fileID: 8272731286028157678, guid: f8eef57eb3f2f41489c32b56dcb7f669, type: 3}
   BuildingUI: {fileID: 0}
   Level: 1
 --- !u!1 &4952732974945623636
@@ -303,5 +304,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dedaa173d69f7924dafd79e6bbb89df3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Forge
+  BuildingUIPrefab: {fileID: 0}
   BuildingUI: {fileID: 0}
   Level: 1

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 public class Forge : BuildingScript
 {
+
     [SerializeField] int Level = 1;
 
     private readonly List<CraftJob> Jobs = new ();
