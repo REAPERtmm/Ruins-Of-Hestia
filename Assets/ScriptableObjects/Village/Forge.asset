@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbd84752a9272dc4d9d49adfc472b5c0, type: 3}
   m_Name: Forge
   m_EditorClassIdentifier: Assembly-CSharp::BuildingDescriptor
-  Name: House
-  Prefab: {fileID: 8660684453734734046, guid: 5e3475186675862418b0270518209e54, type: 3}
+  Name: Forge
+  Prefab: {fileID: 1074613482907823185, guid: 4461489a876ed184facd1226a7eda930, type: 3}
   Fondation:
     Width: 3
     Height: 3
