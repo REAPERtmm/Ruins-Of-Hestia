@@ -10,7 +10,7 @@ public struct ResourcesCost
 [CreateAssetMenu(menuName = "Forge/ForgeRecipe")]
 public class ForgeRecipe : ScriptableObject
 {
-    public Equipement Result;
+    public EquipmentDefinition Result;
 
     public int CraftingTime;
 
