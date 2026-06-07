@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Playables;
 
 public struct HitInstanceDescriptor
 {
@@ -13,40 +15,29 @@ public class HitBoxAttack : MonoBehaviour
 
     Vector3 LastPosition = Vector3.zero;
     bool ShouldFaceDirection;
-    float TimeShouldDie;
 
-    public void Init(in HitInstanceDescriptor desc, float scale, float lingeringTime, bool shouldFaceDirection = false)
+    public void Init(in HitInstanceDescriptor desc, int penetration, float range, Vector3 direction, Vector3 offset, bool shouldFaceDirection = false)
     {
         HitInstance = desc;
+        ShouldFaceDirection = shouldFaceDirection;
+        // SelfCollider.excludeLayers = desc.SourceController.GROUP == EntityGroup.Ennemi ? LayerMask.GetMask("Ennemi") : LayerMask.GetMask("Ally");
+        Penetration = penetration;
 
-        transform.localScale = Vector3.one * scale;
-        TimeShouldDie = Time.time + lingeringTime;
+        transform.rotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
+
+        Transform collider_transform = SelfCollider.transform;
+        collider_transform.localPosition = offset;
+        collider_transform.localScale = Vector3.one * range;
     }
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        string target;
-        switch(HitInstance.SourceController.GROUP)
-        {
-            default:
-            case EntityGroup.Ally: target = "Ally"; break;
-            case EntityGroup.Ennemi: target = "Ennemi"; break;
-        }
+    public void DecrementPenetration() => Penetration--;
 
-        if (collision.transform.tag != target) { 
-            CombatController combat = collision.transform.GetComponent<CombatController>();
-            if (combat == null) return;
+    public bool HasPenetrationRunOut() => Penetration < 0;
 
-            
-        }
-        
-    }
+    public CombatController GetCaster() => HitInstance.SourceController;
 
     private void FixedUpdate()
     {
-        if (Time.time > TimeShouldDie) { 
-            Destroy(gameObject);
-        }
         if(ShouldFaceDirection)
         {
             Vector3 direction = (transform.position - LastPosition).normalized;
@@ -54,5 +45,10 @@ public class HitBoxAttack : MonoBehaviour
         }
 
         LastPosition = transform.position;
+    }
+
+    public void ProccessCollision(CombatController other)
+    {
+        Debug.Log("Hitted : " + other.name);
     }
 }

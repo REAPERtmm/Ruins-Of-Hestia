@@ -22,6 +22,8 @@ public class EnnemiManager : MonoBehaviour
 
     List<Ennemi>[,] EnnemisByRoom;
 
+    public int ENNEMIES_REGISTERED => EnnemisRegistered.Count;
+
     public void RegisterEnnemi( CombatController combat, EnnemiController controller )
     {
         if(EnnemisRegistered == null) EnnemisRegistered = new List<Ennemi>();

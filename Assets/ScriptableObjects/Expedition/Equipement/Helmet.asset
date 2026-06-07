@@ -18,40 +18,40 @@ MonoBehaviour:
     NeededGemToReroll: 2
     StatUnit: 0
     BaseAddModifier: 0
-    MultiplierModifier: 0
+    MultiplierModifier: 1
     FinalAddModifier: 0
   - Stat: 2
     BaseValue: 10
     NeededGemToReroll: 2
     StatUnit: 0
     BaseAddModifier: 0
-    MultiplierModifier: 0
+    MultiplierModifier: 1
     FinalAddModifier: 0
   - Stat: 3
     BaseValue: 1
     NeededGemToReroll: 0
     StatUnit: 1
     BaseAddModifier: 0
-    MultiplierModifier: 0
+    MultiplierModifier: 1
     FinalAddModifier: 0
   - Stat: 4
     BaseValue: 0
     NeededGemToReroll: 1
     StatUnit: 0
     BaseAddModifier: 0
-    MultiplierModifier: 0
+    MultiplierModifier: 1
     FinalAddModifier: 0
   - Stat: 5
     BaseValue: 1
     NeededGemToReroll: 4
     StatUnit: 4
     BaseAddModifier: 0
-    MultiplierModifier: 0
+    MultiplierModifier: 1
     FinalAddModifier: 0
   - Stat: 6
     BaseValue: 0
     NeededGemToReroll: 1
     StatUnit: 0
     BaseAddModifier: 0
-    MultiplierModifier: 0
+    MultiplierModifier: 1
     FinalAddModifier: 0

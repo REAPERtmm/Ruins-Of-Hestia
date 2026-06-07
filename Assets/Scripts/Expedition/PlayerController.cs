@@ -93,7 +93,6 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         UpdateMovements();
-
     }
 
     private void OnDrawGizmos()
