@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Equipement
   EquipmentName: Helmet
   Icon: {fileID: 21300000, guid: 4b613a14bfcd5304094ce94fc283306e, type: 3}
-  Tier: 0
+  Tier: 1
   Slot: 0
   BaseStats: []
   InnateMythicEffect: 0

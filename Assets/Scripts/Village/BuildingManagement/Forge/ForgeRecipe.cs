@@ -1,6 +1,9 @@
 using Mono.Cecil;
+using System.Collections.Generic;
 using UnityEngine;
+using System;
 
+[Serializable]
 public struct ResourcesCost
 {
     public ResourceType Type;

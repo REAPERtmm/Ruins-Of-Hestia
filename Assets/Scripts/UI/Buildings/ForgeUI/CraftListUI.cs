@@ -11,6 +11,8 @@ public class CraftListUI : MonoBehaviour
 
     [SerializeField] private CraftRecipeUI RecipePrefab;
 
+    [SerializeField] private ForgeCraftItemInformation InformationPanel;
+
     private void Start()
     {
         Refresh();
@@ -27,7 +29,7 @@ public class CraftListUI : MonoBehaviour
         {
             CraftRecipeUI ui = Instantiate(RecipePrefab, ContentParent);
 
-            ui.Setup(recipe);
+            ui.Setup(recipe, InformationPanel);
         }
     }
 }

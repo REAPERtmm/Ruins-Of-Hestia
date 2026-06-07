@@ -9,18 +9,21 @@ public class CraftRecipeUI : MonoBehaviour
 
     private ForgeRecipe Recipe;
 
-    public void Setup(ForgeRecipe recipe)
+    private ForgeCraftItemInformation InfoPanel;
+
+    public void Setup(ForgeRecipe recipe, ForgeCraftItemInformation infoPanel)
     {
         Recipe = recipe;
+        InfoPanel = infoPanel;
 
-        RecipeName.text = recipe.name;
+        RecipeName.text = recipe.Result.EquipmentName;
 
         if (recipe.Result != null)
             RecipeIcon.sprite = recipe.Result.Icon;
     }
 
-    public ForgeRecipe GetRecipe()
+    public void OnClick()
     {
-        return Recipe;
+        InfoPanel.Show(Recipe);
     }
 }

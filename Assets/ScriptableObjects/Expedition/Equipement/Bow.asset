@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Equipement
   EquipmentName: Bow
   Icon: {fileID: 21300000, guid: 72e310b16bef32b40909314f2f850476, type: 3}
-  Tier: 0
-  Slot: 0
+  Tier: 2
+  Slot: 6
   BaseStats: []
   InnateMythicEffect: 0
