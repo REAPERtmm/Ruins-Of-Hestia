@@ -5,5 +5,5 @@ public abstract class BuildingsUI : MonoBehaviour
 {
     public abstract void Open(BuildingScript building);
 
-    public abstract void Close();
+    public abstract void Close(); 
 }

@@ -12,6 +12,7 @@ public class ResourceVisualizer : MonoBehaviour
     [Header("General")]
     [SerializeField, Range(0.0f, 1.0f)] private float RatioIconQte  = 0.25f; 
     [SerializeField, Range(0.0f, 1.0f)] private float Overlap       = 0.0f;
+    [SerializeField] private ResourceType resourceType              = ResourceType.Wood;
 
     [Header("Icon")]
     [SerializeField] private Sprite Icon                            = null;
@@ -19,8 +20,7 @@ public class ResourceVisualizer : MonoBehaviour
 
     [Header("Text")]
     [SerializeField] private int FontSize                           = 20;
-    [SerializeField] private Color FontColor                        = Color.black;
-    [SerializeField] private int StartQte                           = 0;
+    [SerializeField] private Color FontColor                        = Color.black; 
 
     private int CurrentQte = 0;
 
@@ -33,13 +33,13 @@ public class ResourceVisualizer : MonoBehaviour
     {
         if(UPDATE)
         {
-            UpdateVisualizer(StartQte, Icon);
+            UpdateVisualizer(Inventory.Instance.GetResource(resourceType), Icon);
         }
     }
 
     void Start()
     {
-        UpdateQte(StartQte);
+        UpdateQte(Inventory.Instance.GetResource(resourceType));
         UpdateIcon(Icon);
     }
 

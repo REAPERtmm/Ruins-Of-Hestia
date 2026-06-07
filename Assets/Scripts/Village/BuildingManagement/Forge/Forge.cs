@@ -34,7 +34,7 @@ public class Forge : BuildingScript
             if (Jobs[i].RemainingCraftingTime <= 0)
             {
                 EquipmentInstance equipment = EquipmentGenerator.Generate(Jobs[i].Recipe.Result, TraitList);
-                // TODO : Add equipement to inventory
+                Inventory.Instance.AddEquipment(equipment);
                 Jobs.RemoveAt(i);
             }
         }

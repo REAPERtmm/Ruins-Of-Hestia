@@ -1342,6 +1342,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ForgeCraftItemInformation
   CostUI: {fileID: 994750919964175113}
+  CraftButton: {fileID: 7046584790022344884}
+  forgeUI: {fileID: 6654884877716713630}
 --- !u!1 &3820205395077360793
 GameObject:
   m_ObjectHideFlags: 0
@@ -1848,7 +1850,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8264748277675892111}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8317739553220445038}
+        m_TargetAssemblyTypeName: ForgeCraftItemInformation, Assembly-CSharp
+        m_MethodName: StartCraft
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &5210306442649569128
 GameObject:
   m_ObjectHideFlags: 0
