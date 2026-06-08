@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
 
@@ -65,6 +66,8 @@ public class VillageManager : MonoBehaviour
         {
             if (Grid.CursorToGrid( out Vector2 gridPos))
             {
+                if (EventSystem.current.IsPointerOverGameObject())
+                    return;
 
                 Tile tile = Grid.GetTile(gridPos);
 

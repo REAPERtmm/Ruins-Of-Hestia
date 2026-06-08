@@ -6,6 +6,8 @@ public class Forge : BuildingScript
 
     [SerializeField] int Level = 1;
 
+    [SerializeField] private TraitList TraitList;
+
     private readonly List<CraftJob> Jobs = new ();
 
     public int MaxSlot => 2 + (Level - 1);
@@ -31,7 +33,8 @@ public class Forge : BuildingScript
 
             if (Jobs[i].RemainingCraftingTime <= 0)
             {
-                // TODO : Add equipement to inventory
+                EquipmentInstance equipment = EquipmentGenerator.Generate(Jobs[i].Recipe.Result, TraitList);
+                Inventory.Instance.AddEquipment(equipment);
                 Jobs.RemoveAt(i);
             }
         }

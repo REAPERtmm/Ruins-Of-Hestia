@@ -1,8 +1,10 @@
+using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class ForgeUI : BuildingsUI
 {
-    private Forge CurrentForge;
+    [SerializeField] private Forge CurrentForge;
     [SerializeField] private GameObject UiForge;
 
     public override void Open(BuildingScript building)
@@ -10,8 +12,6 @@ public class ForgeUI : BuildingsUI
         CurrentForge = (Forge)building;
 
         UiForge.SetActive(true);
-
-        Refresh();
     }
 
     public override void Close()
@@ -19,8 +19,20 @@ public class ForgeUI : BuildingsUI
         UiForge.SetActive(false);
     }
 
-    private void Refresh()
+    public Forge GetForge()
     {
-        // show craft
+        return CurrentForge;
+    }
+
+    public void Update()
+    {
+        if (Keyboard.current.f3Key.wasPressedThisFrame)
+        {
+            if (CurrentForge != null)
+            {
+                CurrentForge.PassDay();
+                Debug.Log("PassDay");
+            }
+        }
     }
 }

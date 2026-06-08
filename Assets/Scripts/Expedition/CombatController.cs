@@ -11,15 +11,15 @@ public enum EntityGroup
 public class CombatController : MonoBehaviour
 {
     [Header("Defensive")]
-    [SerializeField] Equipement Helmet;
-    [SerializeField] Equipement ChestPlate;
-    [SerializeField] Equipement Gloves;
-    [SerializeField] Equipement Legs;
-    [SerializeField] Equipement Boots;
+    [SerializeField] EquipmentInstance Helmet;
+    [SerializeField] EquipmentInstance ChestPlate;
+    [SerializeField] EquipmentInstance Gloves;
+    [SerializeField] EquipmentInstance Legs;
+    [SerializeField] EquipmentInstance Boots;
 
     [Header("Offensive")]
-    [SerializeField] Equipement MeleeWeapon;
-    [SerializeField] Equipement DistanceWeapon;
+    [SerializeField] EquipmentInstance MeleeWeapon;
+    [SerializeField] EquipmentInstance DistanceWeapon;
 
     [Header("Hostility")]
     [SerializeField] List<Transform> Targets = new List<Transform>();
@@ -47,11 +47,22 @@ public class CombatController : MonoBehaviour
         get
         {
             float value = BaseMaxHP;
-            if (Helmet != null) value += Helmet         .GetStatistic(StatName.HealthPoint).FinalValue;
-            if (ChestPlate != null) value += ChestPlate .GetStatistic(StatName.HealthPoint).FinalValue;
-            if (Gloves != null) value += Helmet         .GetStatistic(StatName.HealthPoint).FinalValue;
-            if (Legs != null) value += Legs             .GetStatistic(StatName.HealthPoint).FinalValue;
-            if (Boots != null) value += Boots           .GetStatistic(StatName.HealthPoint).FinalValue;
+
+            if (Helmet != null)
+                value += EquipmentStatCalculator.GetStat(Helmet, StatName.HealthPoint);
+
+            if (ChestPlate != null)
+                value += EquipmentStatCalculator.GetStat(ChestPlate, StatName.HealthPoint);
+
+            if (Gloves != null)
+                value += EquipmentStatCalculator.GetStat(Gloves, StatName.HealthPoint);
+
+            if (Legs != null)
+                value += EquipmentStatCalculator.GetStat(Legs, StatName.HealthPoint);
+
+            if (Boots != null)
+                value += EquipmentStatCalculator.GetStat(Boots, StatName.HealthPoint);
+
             return value;
         }
     }
@@ -60,11 +71,22 @@ public class CombatController : MonoBehaviour
         get
         {
             float value = BaseArmor;
-            if (Helmet != null)  value += Helmet        .GetStatistic(StatName.Armor).FinalValue;
-            if (ChestPlate != null) value += ChestPlate .GetStatistic(StatName.Armor).FinalValue;
-            if (Gloves != null) value += Helmet         .GetStatistic(StatName.Armor).FinalValue;
-            if (Legs != null) value += Legs             .GetStatistic(StatName.Armor).FinalValue;
-            if (Boots != null) value += Boots           .GetStatistic(StatName.Armor).FinalValue;
+
+            if (Helmet != null)
+                value += EquipmentStatCalculator.GetStat(Helmet, StatName.Armor);
+
+            if (ChestPlate != null)
+                value += EquipmentStatCalculator.GetStat(ChestPlate, StatName.Armor);
+
+            if (Gloves != null)
+                value += EquipmentStatCalculator.GetStat(Gloves, StatName.Armor);
+
+            if (Legs != null)
+                value += EquipmentStatCalculator.GetStat(Legs, StatName.Armor);
+
+            if (Boots != null)
+                value += EquipmentStatCalculator.GetStat(Boots, StatName.Armor);
+
             return value;
         }
     }
@@ -73,11 +95,22 @@ public class CombatController : MonoBehaviour
         get
         {
             float value = BaseStrength;
-            if (Helmet != null) value += Helmet         .GetStatistic(StatName.Strength).FinalValue;
-            if (ChestPlate != null) value += ChestPlate .GetStatistic(StatName.Strength).FinalValue;
-            if (Gloves != null) value += Helmet         .GetStatistic(StatName.Strength).FinalValue;
-            if (Legs != null) value += Legs             .GetStatistic(StatName.Strength).FinalValue;
-            if (Boots != null) value += Boots           .GetStatistic(StatName.Strength).FinalValue;
+
+            if (Helmet != null)
+                value += EquipmentStatCalculator.GetStat(Helmet, StatName.Strength);
+
+            if (ChestPlate != null)
+                value += EquipmentStatCalculator.GetStat(ChestPlate, StatName.Strength);
+
+            if (Gloves != null)
+                value += EquipmentStatCalculator.GetStat(Gloves, StatName.Strength);
+
+            if (Legs != null)
+                value += EquipmentStatCalculator.GetStat(Legs, StatName.Strength);
+
+            if (Boots != null)
+                value += EquipmentStatCalculator.GetStat(Boots, StatName.Strength);
+
             return value;
         }
     }
@@ -86,11 +119,22 @@ public class CombatController : MonoBehaviour
         get
         {
             float value = BaseSpeed;
-            if (Helmet != null) value += Helmet         .GetStatistic(StatName.Speed).FinalValue;
-            if (ChestPlate != null) value += ChestPlate .GetStatistic(StatName.Speed).FinalValue;
-            if (Gloves != null) value += Helmet         .GetStatistic(StatName.Speed).FinalValue;
-            if (Legs != null) value += Legs             .GetStatistic(StatName.Speed).FinalValue;
-            if (Boots != null) value += Boots           .GetStatistic(StatName.Speed).FinalValue;
+
+            if (Helmet != null)
+                value += EquipmentStatCalculator.GetStat(Helmet, StatName.Speed);
+
+            if (ChestPlate != null)
+                value += EquipmentStatCalculator.GetStat(ChestPlate, StatName.Speed);
+
+            if (Gloves != null)
+                value += EquipmentStatCalculator.GetStat(Gloves, StatName.Speed);
+
+            if (Legs != null)
+                value += EquipmentStatCalculator.GetStat(Legs, StatName.Speed);
+
+            if (Boots != null)
+                value += EquipmentStatCalculator.GetStat(Boots, StatName.Speed);
+
             return value;
         }
     }
@@ -99,11 +143,22 @@ public class CombatController : MonoBehaviour
         get
         {
             float value = BaseLuck;
-            if (Helmet != null) value += Helmet         .GetStatistic(StatName.Luck).FinalValue;
-            if (ChestPlate != null) value += ChestPlate .GetStatistic(StatName.Luck).FinalValue;
-            if (Gloves != null) value += Helmet         .GetStatistic(StatName.Luck).FinalValue;
-            if (Legs != null) value += Legs             .GetStatistic(StatName.Luck).FinalValue;
-            if (Boots != null) value += Boots           .GetStatistic(StatName.Luck).FinalValue;
+
+            if (Helmet != null)
+                value += EquipmentStatCalculator.GetStat(Helmet, StatName.Luck);
+
+            if (ChestPlate != null)
+                value += EquipmentStatCalculator.GetStat(ChestPlate, StatName.Luck);
+
+            if (Gloves != null)
+                value += EquipmentStatCalculator.GetStat(Gloves, StatName.Luck);
+
+            if (Legs != null)
+                value += EquipmentStatCalculator.GetStat(Legs, StatName.Luck);
+
+            if (Boots != null)
+                value += EquipmentStatCalculator.GetStat(Boots, StatName.Luck);
+
             return value;
         }
     }
@@ -111,12 +166,23 @@ public class CombatController : MonoBehaviour
     {
         get
         {
-            float value = BaseLuck;
-            if (Helmet != null) value += Helmet         .GetStatistic(StatName.Provocation).FinalValue;
-            if (ChestPlate != null) value += ChestPlate .GetStatistic(StatName.Provocation).FinalValue;
-            if (Gloves != null) value += Helmet         .GetStatistic(StatName.Provocation).FinalValue;
-            if (Legs != null) value += Legs             .GetStatistic(StatName.Provocation).FinalValue;
-            if (Boots != null) value += Boots           .GetStatistic(StatName.Provocation).FinalValue;
+            float value = BaseProvocation;
+
+            if (Helmet != null)
+                value += EquipmentStatCalculator.GetStat(Helmet, StatName.Provocation);
+
+            if (ChestPlate != null)
+                value += EquipmentStatCalculator.GetStat(ChestPlate, StatName.Provocation);
+
+            if (Gloves != null)
+                value += EquipmentStatCalculator.GetStat(Gloves, StatName.Provocation);
+
+            if (Legs != null)
+                value += EquipmentStatCalculator.GetStat(Legs, StatName.Provocation);
+
+            if (Boots != null)
+                value += EquipmentStatCalculator.GetStat(Boots, StatName.Provocation);
+
             return value;
         }
     }
@@ -147,11 +213,11 @@ public class CombatController : MonoBehaviour
         float range = 0;
         if (IsUsingMelee && MeleeWeapon != null)
         {
-            range = MeleeWeapon.GetStatistic(StatName.MeleeRange).FinalValue;
+            range = EquipmentStatCalculator.GetStat(MeleeWeapon, StatName.MeleeRange);
         }
         else if(DistanceWeapon != null)
         {
-            range = DistanceWeapon.GetStatistic(StatName.MaxRange).FinalValue;
+            range = EquipmentStatCalculator.GetStat(DistanceWeapon, StatName.MaxRange);
         }
         return DistanceToClosest < range;
     }

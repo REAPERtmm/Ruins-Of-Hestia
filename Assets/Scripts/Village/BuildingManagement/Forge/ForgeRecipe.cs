@@ -1,6 +1,9 @@
 using Mono.Cecil;
+using System.Collections.Generic;
 using UnityEngine;
+using System;
 
+[Serializable]
 public struct ResourcesCost
 {
     public ResourceType Type;
@@ -10,7 +13,7 @@ public struct ResourcesCost
 [CreateAssetMenu(menuName = "Forge/ForgeRecipe")]
 public class ForgeRecipe : ScriptableObject
 {
-    public Equipement Result;
+    public EquipmentDefinition Result;
 
     public int CraftingTime;
 

@@ -9,49 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4bb17d7350d04a047aa95728138cec0d, type: 3}
+  m_Script: {fileID: 11500000, guid: bf03261eb811b604498f57d7c9c521e2, type: 3}
   m_Name: Helmet
   m_EditorClassIdentifier: Assembly-CSharp::Equipement
-  Statistics:
-  - Stat: 1
-    BaseValue: 10
-    NeededGemToReroll: 2
-    StatUnit: 0
-    BaseAddModifier: 0
-    MultiplierModifier: 0
-    FinalAddModifier: 0
-  - Stat: 2
-    BaseValue: 10
-    NeededGemToReroll: 2
-    StatUnit: 0
-    BaseAddModifier: 0
-    MultiplierModifier: 0
-    FinalAddModifier: 0
-  - Stat: 3
-    BaseValue: 1
-    NeededGemToReroll: 0
-    StatUnit: 1
-    BaseAddModifier: 0
-    MultiplierModifier: 0
-    FinalAddModifier: 0
-  - Stat: 4
-    BaseValue: 0
-    NeededGemToReroll: 1
-    StatUnit: 0
-    BaseAddModifier: 0
-    MultiplierModifier: 0
-    FinalAddModifier: 0
-  - Stat: 5
-    BaseValue: 1
-    NeededGemToReroll: 4
-    StatUnit: 4
-    BaseAddModifier: 0
-    MultiplierModifier: 0
-    FinalAddModifier: 0
-  - Stat: 6
-    BaseValue: 0
-    NeededGemToReroll: 1
-    StatUnit: 0
-    BaseAddModifier: 0
-    MultiplierModifier: 0
-    FinalAddModifier: 0
+  EquipmentName: Helmet
+  Icon: {fileID: 21300000, guid: 4b613a14bfcd5304094ce94fc283306e, type: 3}
+  Tier: 1
+  Slot: 0
+  BaseStats: []
+  InnateMythicEffect: 0
