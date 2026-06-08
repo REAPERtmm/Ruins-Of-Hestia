@@ -12,15 +12,21 @@ public enum VillageMode
 
 public class VillageManager : MonoBehaviour
 {
+
+    [Header("Buildings")]
     public List<Building> BuildingObjects = new();
     public Transform BuildingsContainer;
     public Transform BuildingsUIContainer;
 
     public BuildingScript SelectedBuilding;
+    public int PlacingBuildingIndex = -1;
 
     [Space(10)]
     public Grid Grid;
     public VillageMode CurrentMode;
+
+    [Header("UI")]
+    public UiManager UiManager;
 
     [Header("Debug")]
     public GameObject DebugCube;
@@ -45,8 +51,6 @@ public class VillageManager : MonoBehaviour
 
     private void Update()
     {
-
-
         UpdateView();
 
         UpdatePlacement();
@@ -79,7 +83,6 @@ public class VillageManager : MonoBehaviour
                 }
             }
         }
-
     }
 
     private void UpdatePlacement()
@@ -87,13 +90,16 @@ public class VillageManager : MonoBehaviour
         if (CurrentMode != VillageMode.Placement)
             return;
 
+        if (PlacingBuildingIndex == -1)
+            return;
+
         if (Grid.CursorToGrid(out Vector2 gridPos))
         {
             // Build preview
-            if (!Grid.IsOccupied(gridPos, BuildingObjects[0].Fondation))
+            if (!Grid.IsOccupied(gridPos, BuildingObjects[PlacingBuildingIndex].Fondation))
             {
-                BuildingTemplate[0].SetActive(true);
-                BuildingTemplate[0].transform.position = new (gridPos.x, 0, gridPos.y);
+                BuildingTemplate[PlacingBuildingIndex].SetActive(true);
+                BuildingTemplate[PlacingBuildingIndex].transform.position = new (gridPos.x, 0, gridPos.y);
             }
 
             // Cursor
@@ -102,13 +108,24 @@ public class VillageManager : MonoBehaviour
             // Placement
             if (Mouse.current.leftButton.wasPressedThisFrame)
             {
-                Grid.PlaceBuilding(gridPos, BuildingObjects[0]);
+                Grid.PlaceBuilding(gridPos, BuildingObjects[PlacingBuildingIndex]);
                 Grid.GetTile(gridPos).BuildingScript.Instantiate( BuildingsUIContainer );
-                BuildingTemplate[0].SetActive(false);
+                BuildingTemplate[PlacingBuildingIndex].SetActive(false);
                 ToViewMode();
             }
         }
+    }
 
+    public void StartPlacing(int index)
+    {
+        PlacingBuildingIndex = index;
+        ToPlacementMode();
+    }
+
+    public void StopPlacing()
+    {
+        PlacingBuildingIndex = -1;
+        ToViewMode();
     }
 
     public void ToViewMode() => ChangeMode(VillageMode.View);
@@ -118,5 +135,6 @@ public class VillageManager : MonoBehaviour
     public void ChangeMode(VillageMode mode)
     {
         CurrentMode = mode;
+        UiManager.Activate(mode);
     }
 }
