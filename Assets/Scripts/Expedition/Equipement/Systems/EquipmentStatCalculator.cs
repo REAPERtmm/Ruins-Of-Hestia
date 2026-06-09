@@ -25,11 +25,11 @@ public static class EquipmentStatCalculator
 
             switch (trait.Type)
             {
-                case TraitType.Additive:
+                case TraitType.Flat:
                     additive += trait.Value;
                     break;
 
-                case TraitType.Multiplicative:
+                case TraitType.Percent:
                     multiplier *= trait.Value;
                     break;
             }

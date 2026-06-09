@@ -3,7 +3,7 @@
 [Serializable]
 public enum TraitType
 {
-    Additive,
-    Multiplicative,
+    Flat,
+    Percent,
     Special
 }

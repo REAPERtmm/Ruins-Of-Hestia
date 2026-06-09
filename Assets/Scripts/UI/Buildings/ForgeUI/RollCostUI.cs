@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
 public class RollCostUI : MonoBehaviour
 {
     [SerializeField] private TMP_Text Tier;
-    [SerializeField] private TraitInformation TraitPrefab;
+    [SerializeField] private TraitInformation TraitPrefab; 
 
     private EquipmentInstance EquipmentInstance;
 
@@ -43,12 +44,11 @@ public class RollCostUI : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        for (int i = 0; i < EquipmentInstance.Traits.Count; i++)
+        foreach (var trait in EquipmentInstance.Traits)
         {
             TraitInformation info = Instantiate(TraitPrefab, parent);
-            info.TraitName.text = EquipmentInstance.Traits[i].Stat.ToString();
-            info.TraitValue.text = Math.Round(EquipmentInstance.Traits[i].Value, 2).ToString();
-        } 
+            info.Initialize(trait); 
+        }
     }
 
     public void Clear()
@@ -56,4 +56,4 @@ public class RollCostUI : MonoBehaviour
         EquipmentInstance = null;
         Tier.text = "I";
     }
-}
+} 

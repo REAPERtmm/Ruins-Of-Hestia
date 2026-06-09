@@ -9,23 +9,40 @@ class TraitInformation : MonoBehaviour
 {
     public TMP_Text TraitName;
     public TMP_Text TraitValue;
-    public bool IsLocked = false; 
     public Image LockImageTrue;
-    public Image LockImageFalse; 
+    public Image LockImageFalse;
+
+    private TraitInstance trait;
+
+    public void Initialize(TraitInstance traitInstance)
+    {
+        trait = traitInstance;
+
+        TraitName.text = trait.Stat.ToString();
+        TraitValue.text = trait.Value.ToString("F2");
+        
+        switch(traitInstance.Type)
+        {
+            case TraitType.Flat:
+                TraitValue.text = trait.Value.ToString("F2");
+                break;
+            case TraitType.Percent:
+                TraitValue.text = (trait.Value).ToString("F2") + "%";
+                break;
+        }
+
+        UpdateLockVisual();
+    }
 
     public void Lock()
     {
-        IsLocked = !IsLocked;
+        trait.IsLocked = !trait.IsLocked;
+        UpdateLockVisual();
+    }
 
-        if (IsLocked)
-        {
-            LockImageTrue.gameObject.SetActive(true);
-            LockImageFalse.gameObject.SetActive(false);
-        }
-        else
-        {
-            LockImageFalse.gameObject.SetActive(true);
-            LockImageTrue.gameObject.SetActive(false);
-        }
+    private void UpdateLockVisual()
+    {
+        LockImageTrue.gameObject.SetActive(trait.IsLocked);
+        LockImageFalse.gameObject.SetActive(!trait.IsLocked);
     }
 }

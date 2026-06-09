@@ -5,13 +5,13 @@ public class TraitGenerationRule
 {
     public StatName Stat;
 
-    public bool AllowAdditive;
+    public bool AllowFlat;
 
-    public bool AllowMultiplicative;
+    public bool AllowPercent;
 
-    public float AdditiveMin;
-    public float AdditiveMax;
+    public float FlatMin;
+    public float FlatMax;
 
-    public float MultiplicativeMin;
-    public float MultiplicativeMax;
+    public float PercentMin;
+    public float PercentMax;
 }
