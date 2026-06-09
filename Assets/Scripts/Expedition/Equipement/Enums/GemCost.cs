@@ -1,7 +1,7 @@
 ﻿using System;
 
 [Serializable]
-public enum GemCost
+public enum GemType
 {
     Red,
     Blue,

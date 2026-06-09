@@ -25,4 +25,8 @@ public abstract class BuildingScript : MonoBehaviour
     {
         BuildingUI.Close();
     }
+
+    public virtual void PassDay()
+    { 
+    }
 }

@@ -33,6 +33,19 @@ public static class EquipmentGenerator
         return equipment;
     }
 
+    public static void RollTrait(ref EquipmentInstance equipment, TraitList traitList)
+    {
+        for (int i = 0; i < equipment.Traits.Count; i++)
+        {
+            TraitInstance trait = equipment.Traits[i];
+            if (!trait.IsLocked)
+            {
+                trait = GenerateTrait(equipment.Definition.Tier, traitList);
+            }
+            equipment.Traits[i] = trait;
+        }
+    }
+
     public static int GetTraitCount(EquipmentTier tier)
     {
         return tier switch

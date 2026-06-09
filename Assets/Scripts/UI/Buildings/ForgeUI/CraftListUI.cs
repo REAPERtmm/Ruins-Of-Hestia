@@ -13,7 +13,7 @@ public class CraftListUI : MonoBehaviour
 
     [SerializeField] private ForgeCraftItemInformation InformationPanel;
 
-    private void Start()
+    public void OnEnable()
     {
         Refresh();
     }
