@@ -10,6 +10,11 @@ public class RollListUI : MonoBehaviour
 
     [SerializeField] private ForgeRollItemInformation InformationPanel;
 
+    public void Start()
+    {
+        Refresh();
+    }
+
     public void OnEnable()
     {
         Refresh();
