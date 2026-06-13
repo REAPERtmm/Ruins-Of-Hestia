@@ -448,6 +448,8 @@ public class MapGeneration : MonoBehaviour
         Vector3 random_offset = new Vector3(random_offset_x, 0, random_offset_y);
 
         instance.transform.position = position + random_offset;
+
+        ManagerResources.AppendResourceInRoom(instance.transform);
         return instance.transform;
     }
 
@@ -540,7 +542,8 @@ public class MapGeneration : MonoBehaviour
         // Room Objects :
         RoomObjects = new RoomObject[RoomCount.x, RoomCount.y];
 
-        ManagerEnnemis.ForgetEveryRegistered();
+        ManagerEnnemis.InitWithRoom(RoomCount, RoomScale);
+        ManagerResources.InitRooms(RoomCount, RoomScale);
 
         for (int x = 0; x < RoomCount.x; ++x)
         {

@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] Animator CaliAnimator;
     [SerializeField] public CombatController Combat;
     [SerializeField] EnnemiManager ManagerEnnemis;
+    [SerializeField] ResourceManager ManagerResources;
     MapGeneration MapGenerationManager;
 
     [Header("Parameters")]
@@ -22,6 +23,9 @@ public class PlayerController : MonoBehaviour
 
     CharacterController characterController;
     InputAction ControlMove;
+
+    [SerializeField] ResourceDescriptor closestResource = null;
+    [SerializeField] Ennemi closestEnnemi = null;
 
     public Vector2 NormalizedPlayerPositionInMap
     {
@@ -52,6 +56,63 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         MapGenerationManager = transform.parent.GetComponent<MapGeneration>();
+    }
+
+    void UpdateResourceTarget()
+    {
+        if(ManagerResources == null)
+        {
+            Debug.Log("No Resource Manager attached");
+            return;
+        }
+
+        ResourceDescriptor closest = ManagerResources.GetClosestResource(transform.position);
+        if(closest == null)
+        {
+            Debug.Log("No resource found");
+            return;
+        }
+
+        if (closest != closestResource) {
+
+            if (closestResource != null && closestResource.ResourceTransform != null)
+            {
+                // Debug.Log("Changed closest from : " + closestResource.ResourceTransform + " / to : " + closest.ResourceTransform);
+                closestResource.ResourceTransform.localScale = Vector3.one;
+            }
+            closest.ResourceTransform.localScale = Vector3.one * 1.3f;
+            closestResource = closest;
+        }
+
+    }
+
+    void UpdateEnnemiTarget()
+    {
+        if (ManagerEnnemis == null)
+        {
+            Debug.Log("No Ennemi Manager attached");
+            return;
+        }
+
+        Ennemi closest = ManagerEnnemis.GetClosestEnnemi(transform.position);
+        if (closest == null)
+        {
+            Debug.Log("No ennemi found");
+            return;
+        }
+
+        if (closest != closestEnnemi)
+        {
+
+            if (closestEnnemi != null && closestEnnemi.Controller != null)
+            {
+                // Debug.Log("Changed closest from : " + closestResource.ResourceTransform + " / to : " + closest.ResourceTransform);
+                closestEnnemi.Controller.transform.localScale = Vector3.one;
+            }
+            closest.Controller.transform.localScale = Vector3.one * 1.3f;
+            closestEnnemi = closest;
+        }
+
     }
 
     void UpdateMiniMapPlayerUI()
@@ -128,6 +189,8 @@ public class PlayerController : MonoBehaviour
     {
         UpdateMovements();
         UpdateMiniMapPlayerUI();
+        UpdateResourceTarget();
+        UpdateEnnemiTarget();
     }
 
     private void OnDrawGizmos()
