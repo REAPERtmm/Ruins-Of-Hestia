@@ -6,12 +6,21 @@ public static class EquipmentStatCalculator
     public static float GetStat(EquipmentInstance equipment, StatName stat)
     {
         if (equipment == null)
-            return 0;
+            return 0.0f;
+
+        if (equipment.Definition == null)
+            return 0.0f;
+
+        if (equipment.Definition.BaseStats == null)
+            return 0.0f;
+
+        if (equipment.Definition.BaseStats.Length == 0)
+            return 0.0f;
 
         Statistic baseStat = Array.Find(equipment.Definition.BaseStats, x => x.Stat == stat);
 
         if (baseStat == null)
-            return 0;
+            return 0.0f;
 
         float baseValue = baseStat.Value;
 

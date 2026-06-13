@@ -197,7 +197,7 @@ public class CombatController : MonoBehaviour
     {
         get
         {
-            if (MeleeWeapon != null) return MeleeWeapon.GetStatistic(StatName.Damage).FinalValue;
+            if (MeleeWeapon != null) return EquipmentStatCalculator.GetStat(MeleeWeapon, StatName.Damage);
             return 0;
         }
     }
@@ -206,7 +206,8 @@ public class CombatController : MonoBehaviour
     {
         get
         {
-            if (MeleeWeapon != null) return MeleeWeapon.GetStatistic(StatName.CriticalChance).FinalValue;
+
+            if (MeleeWeapon != null) return EquipmentStatCalculator.GetStat(MeleeWeapon, StatName.CriticalChance);
             return 0;
         }
     }
@@ -215,7 +216,7 @@ public class CombatController : MonoBehaviour
     {
         get
         {
-            if (MeleeWeapon != null) return MeleeWeapon.GetStatistic(StatName.CriticalMultiplier).FinalValue;
+            if (MeleeWeapon != null) return EquipmentStatCalculator.GetStat(MeleeWeapon, StatName.CriticalMultiplier);
             return 0;
         }
     }
@@ -224,7 +225,7 @@ public class CombatController : MonoBehaviour
     {
         get
         {
-            if (MeleeWeapon != null) return MeleeWeapon.GetStatistic(StatName.AttackSpeed).FinalValue;
+            if (MeleeWeapon != null) return EquipmentStatCalculator.GetStat(MeleeWeapon, StatName.AttackSpeed);
             return 0;
         }
     }
@@ -235,7 +236,7 @@ public class CombatController : MonoBehaviour
         {
             if (MeleeWeapon != null)
             {
-                return MeleeWeapon.GetStatistic(StatName.MeleeRange).FinalValue * 2.0f;
+                return EquipmentStatCalculator.GetStat(MeleeWeapon, StatName.MeleeRange) * 2.0f;
             }
             return 0;
         }

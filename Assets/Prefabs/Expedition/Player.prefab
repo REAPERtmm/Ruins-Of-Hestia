@@ -96,6 +96,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cf1cf92580543a4a8f864bb29d0ba98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
+  PlayerMiniMapUI: {fileID: 0}
   CaliAnimator: {fileID: 3482686469855565781}
   Combat: {fileID: 8127787276281221390}
   ManagerEnnemis: {fileID: 0}
@@ -113,15 +114,43 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52e9facb7c543714ab4b406ceeca1fd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CombatController
-  Helmet: {fileID: 11400000, guid: 3560f78fd8278824db0cfb5ee5d4c098, type: 2}
-  ChestPlate: {fileID: 0}
-  Gloves: {fileID: 0}
-  Pants: {fileID: 0}
-  Boots: {fileID: 0}
-  MeleeWeapon: {fileID: 11400000, guid: 70bfd6d1c0664764796b2e2321133ec2, type: 2}
-  DistanceWeapon: {fileID: 11400000, guid: 61588320c61f6804b8971672603fee73, type: 2}
-  TargetGroup: 1
+  MeleeAttack: {fileID: 0}
+  Helmet:
+    Definition: {fileID: 0}
+    UpgradeLevel: 0
+    Traits: []
+  ChestPlate:
+    Definition: {fileID: 0}
+    UpgradeLevel: 0
+    Traits: []
+  Gloves:
+    Definition: {fileID: 0}
+    UpgradeLevel: 0
+    Traits: []
+  Legs:
+    Definition: {fileID: 0}
+    UpgradeLevel: 0
+    Traits: []
+  Boots:
+    Definition: {fileID: 0}
+    UpgradeLevel: 0
+    Traits: []
+  MeleeWeapon:
+    Definition: {fileID: 11400000, guid: 70bfd6d1c0664764796b2e2321133ec2, type: 2}
+    UpgradeLevel: 0
+    Traits: []
+  DistanceWeapon:
+    Definition: {fileID: 0}
+    UpgradeLevel: 0
+    Traits: []
   Targets: []
+  MyGroup: 0
+  BaseMaxHP: 100
+  BaseArmor: 0
+  BaseStrength: 1
+  BaseSpeed: 1
+  BaseLuck: 0
+  BaseProvocation: 0
 --- !u!1001 &7007153852085201476
 PrefabInstance:
   m_ObjectHideFlags: 0
