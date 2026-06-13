@@ -400,6 +400,9 @@ public class MapGeneration : MonoBehaviour
     public int RoomCountX { get => RoomCount.x; }
     public int RoomCountY { get => RoomCount.y; }
 
+    public float GenerationSizeX { get => RoomCount.x * RoomScale.x; }
+    public float GenerationSizeY { get => RoomCount.y * RoomScale.y; }
+
     RoomObject CreateRoom(Room room, int x_room, int y_room)
     {
         RoomObject roomObject = new RoomObject();
