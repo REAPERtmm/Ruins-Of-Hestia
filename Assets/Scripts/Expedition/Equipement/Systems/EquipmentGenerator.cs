@@ -33,6 +33,19 @@ public static class EquipmentGenerator
         return equipment;
     }
 
+    public static void RollTrait(ref EquipmentInstance equipment, TraitList traitList)
+    {
+        for (int i = 0; i < equipment.Traits.Count; i++)
+        {
+            TraitInstance trait = equipment.Traits[i];
+            if (!trait.IsLocked)
+            {
+                trait = GenerateTrait(equipment.Definition.Tier, traitList);
+            }
+            equipment.Traits[i] = trait;
+        }
+    }
+
     public static int GetTraitCount(EquipmentTier tier)
     {
         return tier switch
@@ -119,30 +132,30 @@ public static class EquipmentGenerator
 
         TraitType type;
 
-        if (rule.AllowAdditive && rule.AllowMultiplicative)
+        if (rule.AllowFlat && rule.AllowPercent)
         {
-            type = Random.value < 0.5f ? TraitType.Additive : TraitType.Multiplicative;
+            type = Random.value < 0.5f ? TraitType.Flat : TraitType.Percent;
         }
-        else if (rule.AllowAdditive)
+        else if (rule.AllowFlat)
         {
-            type = TraitType.Additive;
+            type = TraitType.Flat;
         }
         else
         {
-            type = TraitType.Multiplicative;
+            type = TraitType.Percent;
         }
 
         float multiplier = GetRarityMultiplier(rarity);
 
         float value;
 
-        if (type == TraitType.Additive)
+        if (type == TraitType.Flat)
         {
-            value = Random.Range(rule.AdditiveMin * multiplier, rule.AdditiveMax * multiplier);
+            value = Random.Range(rule.FlatMin * multiplier, rule.FlatMax * multiplier);
         }
         else
         {
-            value = Random.Range(rule.MultiplicativeMin, rule.MultiplicativeMax);
+            value = Random.Range(rule.PercentMin, rule.PercentMax);
         }
 
         return new TraitInstance()

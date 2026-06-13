@@ -25,6 +25,11 @@ public class Forge : BuildingScript
         return true;    
     }
 
+    public void StartRoll(ref EquipmentInstance equipment)
+    {
+         EquipmentGenerator.RollTrait(ref equipment, TraitList);
+    }
+
     public void PassDay()
     {
         for (int i = Jobs.Count - 1; i >= 0; i--)

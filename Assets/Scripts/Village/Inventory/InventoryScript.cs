@@ -7,17 +7,11 @@ using UnityEngine.InputSystem;
 
 public class Inventory : MonoBehaviour
 {
-    [Serializable]
-    public class ResourceStack
-    {
-        public ResourceType Type;
-        public int Amount;
-    }
-
-
     [SerializeField] private List<EquipmentInstance> equipments = new();
 
     [SerializeField] private List<ResourceStack> resources = new();
+
+    [SerializeField] private List<GemStack> gems = new();
 
     public IReadOnlyList<EquipmentInstance> Equipments => equipments;
 
@@ -36,11 +30,21 @@ public class Inventory : MonoBehaviour
             {
                 e.Amount = 9999;
             }
+            
+            foreach (var e in gems)
+            {
+                e.Amount = 9999;
+            }
         }
         
         if (Keyboard.current.f2Key.wasPressedThisFrame)
         {
             foreach (var e in resources)
+            {
+                e.Amount = 0;
+            }
+            
+            foreach (var e in gems)
             {
                 e.Amount = 0;
             }
@@ -63,6 +67,13 @@ public class Inventory : MonoBehaviour
 
         return stack == null ? 0 : stack.Amount;
     }
+    
+    public int GetResource(GemType type)
+    {
+        GemStack stack = gems.Find(x => x.Type == type);
+
+        return stack == null ? 0 : stack.Amount;
+    }
 
     public void AddResource(ResourceType type, int amount)
     {
@@ -81,10 +92,41 @@ public class Inventory : MonoBehaviour
 
         stack.Amount += amount;
     }
+    public void AddResource(GemType type, int amount)
+    {
+        GemStack stack = gems.Find(x => x.Type == type);
+
+        if (stack == null)
+        {
+            stack = new GemStack()
+            {
+                Type = type,
+                Amount = 0
+            };
+
+            gems.Add(stack);
+        }
+
+        stack.Amount += amount;
+    }
 
     public bool RemoveResource(ResourceType type, int amount)
     {
         ResourceStack stack = resources.Find(x => x.Type == type);
+
+        if (stack == null)
+            return false;
+
+        if (stack.Amount < amount)
+            return false;
+
+        stack.Amount -= amount;
+
+        return true;
+    }
+    public bool RemoveResource(GemType type, int amount)
+    {
+        GemStack stack = gems.Find(x => x.Type == type);
 
         if (stack == null)
             return false;
@@ -107,10 +149,29 @@ public class Inventory : MonoBehaviour
 
         return true;
     }
+    public bool CanAfford(List<GemsCost> costs)
+    {
+        foreach (GemsCost cost in costs)
+        {
+            if (GetResource(cost.Type) < cost.Qte)
+                return false;
+        }
+
+        return true;
+    }
 
     public void Pay(List<ResourcesCost> costs)
     {
         foreach (ResourcesCost cost in costs)
+        {
+            RemoveResource(cost.Type, cost.Qte);
+        }
+    }
+    
+
+    public void Pay(List<GemsCost> costs)
+    {
+        foreach (GemsCost cost in costs)
         {
             RemoveResource(cost.Type, cost.Qte);
         }
