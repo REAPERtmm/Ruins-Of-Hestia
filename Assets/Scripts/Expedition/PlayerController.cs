@@ -1,14 +1,17 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
     public static PlayerController INSTANCE;
 
     [Header("References")]
+    [SerializeField] Image PlayerMiniMapUI;
     [SerializeField] Animator CaliAnimator;
     [SerializeField] public CombatController Combat;
     [SerializeField] EnnemiManager ManagerEnnemis;
+    MapGeneration MapGenerationManager;
 
     [Header("Parameters")]
     [SerializeField] float Speed;
@@ -19,6 +22,15 @@ public class PlayerController : MonoBehaviour
 
     CharacterController characterController;
     InputAction ControlMove;
+
+    public Vector2 NormalizedPlayerPositionInMap
+    {
+        get
+        {
+            if (MapGenerationManager == null) return new Vector2(transform.position.x, transform.position.z);
+            return new Vector2(transform.position.x / MapGenerationManager.GenerationSizeX, transform.position.z / MapGenerationManager.GenerationSizeY);
+        }
+    }
 
     private void OnEnable()
     {
@@ -35,6 +47,29 @@ public class PlayerController : MonoBehaviour
         LookingToward = Quaternion.identity;
         if(INSTANCE == null)
             INSTANCE = this;
+    }
+
+    private void Start()
+    {
+        MapGenerationManager = transform.parent.GetComponent<MapGeneration>();
+    }
+
+    void UpdateMiniMapPlayerUI()
+    {
+        if(MapGenerationManager == null)
+        {
+            return;
+        }
+
+        Vector2 normalized_player_position = NormalizedPlayerPositionInMap;
+        Vector2 centered = normalized_player_position - Vector2.one * 0.5f;
+
+        const float RECT_SIZE = 360;
+        const float RECT_SCALE = 1.0f;
+        const float RECT_RESCALED = RECT_SIZE * RECT_SCALE;
+
+        PlayerMiniMapUI.rectTransform.localPosition = centered * RECT_RESCALED;
+
     }
 
     void UpdateMovements()
@@ -93,7 +128,7 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         UpdateMovements();
-
+        UpdateMiniMapPlayerUI();
     }
 
     private void OnDrawGizmos()

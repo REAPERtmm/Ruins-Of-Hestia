@@ -1,5 +1,6 @@
 
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public enum EnnemiState : int
@@ -35,7 +36,6 @@ public class EnnemiController : MonoBehaviour
     public Vector2Int InitRoom;
 
     bool CollideWithEdgeOfMap;
-    Vector3 MovementThisFrame;
     EnnemiState CurrentState;
     float TimeStateStarted = 0;
     float MaxTime = 0;
@@ -50,21 +50,16 @@ public class EnnemiController : MonoBehaviour
 
     void Move(Vector2 Direction)
     {
-        const float COS45 = 0.70710678f;
-        const float SIN45 = 0.70710678f;
-
         float UsedSpeed = CurrentState == EnnemiState.Focus ? FocusMovementSpeed : RoamingMovementSpeed;
 
         Vector3 movement = new Vector3(
-                Direction.x * COS45 + Direction.y * SIN45,
-                0,
-                -Direction.x * SIN45 + Direction.y * COS45
+                Direction.x, 0, Direction.y
                 ) * UsedSpeed * Time.deltaTime;
 
-        MovementThisFrame = movement;
-        CharController.Move(MovementThisFrame);
+        Vector3 old_position = transform.position;
+        Vector3 next_position = transform.position + movement;
 
-        Ray below = new Ray(transform.position, Vector3.down);
+        Ray below = new Ray(next_position, Vector3.down);
         var hits = Physics.RaycastAll(below, transform.localScale.y * 0.1f);
         CollideWithEdgeOfMap = true;
         foreach (var hit in hits)
@@ -76,13 +71,15 @@ public class EnnemiController : MonoBehaviour
                 break;
             }
         }
+
         if (CollideWithEdgeOfMap)
         {
-            CharController.Move(-MovementThisFrame);
+            transform.position = old_position;
         }
         else if (Direction.x != 0.0f || Direction.y != 0.0f)
         {
-            transform.rotation = Quaternion.LookRotation(movement, Vector3.up);
+            transform.position = next_position;
+            transform.rotation = Quaternion.LookRotation(movement.normalized, Vector3.up);
         }
     }
 
@@ -164,12 +161,26 @@ public class EnnemiController : MonoBehaviour
 
     void UpdateFocus()
     {
-        Vector3 TargetDirection = Target.position - transform.position;
-        Vector2 NormalizedTargetDirection = new Vector2(TargetDirection.x, TargetDirection.z);
-        NormalizedTargetDirection = NormalizedTargetDirection.normalized;
-        Move(NormalizedTargetDirection);
-
+        CombatController TargetCombat = Target?.GetComponent<CombatController>();
+        bool IS_TARGET_DEAD_OR_INANIMATE = TargetCombat == null || TargetCombat.ALIVE == false;
+        if (Target == null || Target.IsDestroyed() || IS_TARGET_DEAD_OR_INANIMATE)
+        {
+            TransitionToIdle();
+            return;
+        }
         float DistanceToTarget = (transform.position - Target.position).magnitude;
+
+        if(Combat.MELEE_RANGE * 0.9f > DistanceToTarget || Combat.IsAttacking)
+        {
+            Combat.AttackClosest();
+        }
+        else
+        {
+            Vector3 TargetDirection = Target.position - transform.position;
+            Vector2 NormalizedTargetDirection = new Vector2(TargetDirection.x, TargetDirection.z);
+            NormalizedTargetDirection = NormalizedTargetDirection.normalized;
+            Move(NormalizedTargetDirection);
+        }
 
         if (DistanceToTarget > FocusMinDistance)
         {

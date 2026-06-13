@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI;
 
 public enum EntityGroup
 {
@@ -10,6 +12,9 @@ public enum EntityGroup
 
 public class CombatController : MonoBehaviour
 {
+    [Header("References")]
+    [SerializeField] GameObject MeleeAttack;
+
     [Header("Defensive")]
     [SerializeField] EquipmentInstance Helmet;
     [SerializeField] EquipmentInstance ChestPlate;
@@ -41,6 +46,7 @@ public class CombatController : MonoBehaviour
 
     Coroutine AttackPlayed;
 
+    public bool ALIVE => CurrentHP > 0;
     public EntityGroup GROUP => MyGroup;
     public float MAX_HP
     {
@@ -187,6 +193,54 @@ public class CombatController : MonoBehaviour
         }
     }
 
+    public float MELEE_DAMAGE
+    {
+        get
+        {
+            if (MeleeWeapon != null) return MeleeWeapon.GetStatistic(StatName.Damage).FinalValue;
+            return 0;
+        }
+    }
+
+    public float MELEE_CRITICAL_CHANCE
+    {
+        get
+        {
+            if (MeleeWeapon != null) return MeleeWeapon.GetStatistic(StatName.CriticalChance).FinalValue;
+            return 0;
+        }
+    }
+
+    public float MELEE_CRITICAL_MULTIPLIER
+    {
+        get
+        {
+            if (MeleeWeapon != null) return MeleeWeapon.GetStatistic(StatName.CriticalMultiplier).FinalValue;
+            return 0;
+        }
+    }
+
+    public float MELEE_ATTACK_SPEED
+    {
+        get
+        {
+            if (MeleeWeapon != null) return MeleeWeapon.GetStatistic(StatName.AttackSpeed).FinalValue;
+            return 0;
+        }
+    }
+
+    public float MELEE_RANGE
+    {
+        get
+        {
+            if (MeleeWeapon != null)
+            {
+                return MeleeWeapon.GetStatistic(StatName.MeleeRange).FinalValue * 2.0f;
+            }
+            return 0;
+        }
+    }
+
     public void RegisterTarget(Transform target) => Targets.Add(target);
 
     private void Start()
@@ -222,10 +276,25 @@ public class CombatController : MonoBehaviour
         return DistanceToClosest < range;
     }
 
-    public IEnumerator DefaultAttackAnimation()
+    public IEnumerator DefaultMeleeAttackAnimation(Vector3 direction, float duration, float delay = 0.0f)
     {
-        // TODO : Launch Animation + Hit Box 
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(delay);
+
+        GameObject instance = Instantiate(MeleeAttack);
+        if (instance == null) {
+            Debug.LogWarning("Failed to launch Attack");
+            yield return null;
+        }
+        
+        HitInstanceDescriptor desc = new HitInstanceDescriptor();
+        desc.SourceController = this;
+
+        HitBoxAttack hitBoxAttack = instance.GetComponent<HitBoxAttack>();
+        hitBoxAttack.Init(in desc, 10000, MELEE_RANGE, direction, Vector3.forward * MELEE_RANGE * 0.5f);
+        hitBoxAttack.transform.position = transform.position;
+
+        yield return new WaitForSeconds(duration);
+        if (instance.IsDestroyed() == false) Destroy(instance);
         AttackPlayed = null;
     }
 
@@ -234,14 +303,18 @@ public class CombatController : MonoBehaviour
     // Return wether it could attack or not
     public bool AttackClosest()
     {
-        if (IsAttacking) {
+        if (IsAttacking || ClosestTarget == null) {
             return false;
         }
-        AttackPlayed = StartCoroutine(DefaultAttackAnimation());
+
+        Vector3 direction = ClosestTarget.position - transform.position;
+        AttackPlayed = StartCoroutine(DefaultMeleeAttackAnimation(direction.normalized, 0.1f, 0.5f));
         return true;
     }
 
     public void FixedUpdate() { 
         UpdateClosest();
+
+        if (MeleeAttack == null) return;
     }
 }

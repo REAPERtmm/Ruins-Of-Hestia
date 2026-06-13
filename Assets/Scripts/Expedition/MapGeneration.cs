@@ -357,7 +357,6 @@ public struct RoomObject
     public Transform Resources;
 }
 
-[ExecuteAlways]
 public class MapGeneration : MonoBehaviour
 {
     public static MapGeneration INSTANCE = null;
@@ -400,6 +399,9 @@ public class MapGeneration : MonoBehaviour
     public bool EnnemiAI { get => DebugEnnemiAI; }
     public int RoomCountX { get => RoomCount.x; }
     public int RoomCountY { get => RoomCount.y; }
+
+    public float GenerationSizeX { get => RoomCount.x * RoomScale.x; }
+    public float GenerationSizeY { get => RoomCount.y * RoomScale.y; }
 
     RoomObject CreateRoom(Room room, int x_room, int y_room)
     {
@@ -461,6 +463,7 @@ public class MapGeneration : MonoBehaviour
 
         controller.InitRoom = obj.RoomPosition;
         ManagerEnnemis.RegisterEnnemi(combat, controller);
+        instance.name = "Ennemi " + ManagerEnnemis.ENNEMIES_REGISTERED;
 
         instance.transform.position = position + random_offset;
         return instance.transform;
@@ -536,6 +539,8 @@ public class MapGeneration : MonoBehaviour
         // Room Objects :
         RoomObjects = new RoomObject[RoomCount.x, RoomCount.y];
 
+        ManagerEnnemis.ForgetEveryRegistered();
+
         for (int x = 0; x < RoomCount.x; ++x)
         {
             for (int y = 0; y < RoomCount.y; ++y)
@@ -576,21 +581,24 @@ public class MapGeneration : MonoBehaviour
 
     public void DestroyGeneration()
     {
-        if (RoomObjects == null) return;
-        for (int x = 0; x < RoomCount.x; ++x)
+        
+        if (RoomObjects != null)
         {
-            for (int y = 0; y < RoomCount.y; ++y)
+            for (int x = 0; x < RoomCount.x; ++x)
             {
-                while (RoomObjects[x, y].Resources.childCount > 0)
+                for (int y = 0; y < RoomCount.y; ++y)
                 {
-                    DestroyImmediate(RoomObjects[x, y].Resources.GetChild(0).gameObject);
+                    while (RoomObjects[x, y].Resources.childCount > 0)
+                    {
+                        DestroyImmediate(RoomObjects[x, y].Resources.GetChild(0).gameObject);
+                    }
+                    while (RoomObjects[x, y].Ennemies.childCount > 0)
+                    {
+                        DestroyImmediate(RoomObjects[x, y].Ennemies.GetChild(0).gameObject);
+                    }
+                    DestroyImmediate(RoomObjects[x, y].Ennemies.gameObject);
+                    DestroyImmediate(RoomObjects[x, y].Resources.gameObject);
                 }
-                while (RoomObjects[x, y].Ennemies.childCount > 0)
-                {
-                    DestroyImmediate(RoomObjects[x, y].Ennemies.GetChild(0).gameObject);
-                }
-                DestroyImmediate(RoomObjects[x, y].Ennemies.gameObject);
-                DestroyImmediate(RoomObjects[x, y].Resources.gameObject);
             }
         }
 
@@ -630,26 +638,6 @@ public class MapGeneration : MonoBehaviour
 
     public void Update()
     {
-        if (GENERATE)
-        {
-            if (Factory != null) DestroyGeneration();
-            Generate(Seed);
-            GENERATE = false;
-        }
-
-        if (DESTROY)
-        {
-            DestroyGeneration();
-            DESTROY = false;
-        }
-
-        if (RoomObjects == null) return;
-        if (RoomObjects[0, 0].Terrain.IsDestroyed())
-        {
-            RoomObjects = null;
-            return;
-        }
-
         int player_x = (int)(Player.transform.position.x / RoomScale.x);
         int player_y = (int)(Player.transform.position.z / RoomScale.y);
         RoomCulling(player_x, player_y);
@@ -659,7 +647,6 @@ public class MapGeneration : MonoBehaviour
     {
         if (Factory == null)
         {
-            DestroyGeneration();
             Generate();
         }
     }
