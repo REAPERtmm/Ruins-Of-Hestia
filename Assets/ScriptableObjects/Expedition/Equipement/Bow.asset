@@ -17,7 +17,28 @@ MonoBehaviour:
   Tier: 2
   Slot: 6
   BaseStats:
-  - Stat: 2
+  - Stat: 7
+    Value: 5
+    Unit: 0
+  - Stat: 8
+    Value: 10
+    Unit: 1
+  - Stat: 9
+    Value: 1.5
+    Unit: 2
+  - Stat: 10
     Value: 1
+    Unit: 2
+  - Stat: 12
+    Value: 1
+    Unit: 5
+  - Stat: 13
+    Value: 1
+    Unit: 2
+  - Stat: 14
+    Value: 5
+    Unit: 4
+  - Stat: 15
+    Value: 0
     Unit: 0
   InnateMythicEffect: 0

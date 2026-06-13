@@ -69,7 +69,6 @@ public class PlayerController : MonoBehaviour
         const float RECT_RESCALED = RECT_SIZE * RECT_SCALE;
 
         PlayerMiniMapUI.rectTransform.localPosition = centered * RECT_RESCALED;
-
     }
 
     void UpdateMovements()
