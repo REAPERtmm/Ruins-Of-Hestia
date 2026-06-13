@@ -99,13 +99,34 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CombatController
   MeleeAttack: {fileID: 2684587428005364855, guid: d1f088fc1b61bc54c81a85c1d249c741, type: 3}
-  Helmet: {fileID: 0}
-  ChestPlate: {fileID: 0}
-  Gloves: {fileID: 0}
-  Legs: {fileID: 0}
-  Boots: {fileID: 0}
-  MeleeWeapon: {fileID: 11400000, guid: 70bfd6d1c0664764796b2e2321133ec2, type: 2}
-  DistanceWeapon: {fileID: 0}
+  Helmet:
+    Definition: {fileID: 11400000, guid: 3560f78fd8278824db0cfb5ee5d4c098, type: 2}
+    UpgradeLevel: 0
+    Traits: []
+  ChestPlate:
+    Definition: {fileID: 0}
+    UpgradeLevel: 0
+    Traits: []
+  Gloves:
+    Definition: {fileID: 0}
+    UpgradeLevel: 0
+    Traits: []
+  Legs:
+    Definition: {fileID: 0}
+    UpgradeLevel: 0
+    Traits: []
+  Boots:
+    Definition: {fileID: 0}
+    UpgradeLevel: 0
+    Traits: []
+  MeleeWeapon:
+    Definition: {fileID: 11400000, guid: 70bfd6d1c0664764796b2e2321133ec2, type: 2}
+    UpgradeLevel: 0
+    Traits: []
+  DistanceWeapon:
+    Definition: {fileID: 0}
+    UpgradeLevel: 0
+    Traits: []
   Targets: []
   MyGroup: 1
   BaseMaxHP: 20

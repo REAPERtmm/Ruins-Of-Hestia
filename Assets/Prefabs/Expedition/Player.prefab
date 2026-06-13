@@ -116,7 +116,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CombatController
   MeleeAttack: {fileID: 0}
   Helmet:
-    Definition: {fileID: 0}
+    Definition: {fileID: 11400000, guid: 3560f78fd8278824db0cfb5ee5d4c098, type: 2}
     UpgradeLevel: 0
     Traits: []
   ChestPlate:
@@ -140,7 +140,7 @@ MonoBehaviour:
     UpgradeLevel: 0
     Traits: []
   DistanceWeapon:
-    Definition: {fileID: 0}
+    Definition: {fileID: 11400000, guid: 61588320c61f6804b8971672603fee73, type: 2}
     UpgradeLevel: 0
     Traits: []
   Targets: []

@@ -16,7 +16,6 @@ public class EnnemiController : MonoBehaviour
     [SerializeField] Animator Animation;
     [SerializeField] Transform Model;
     [SerializeField] CapsuleCollider Collider;
-    [SerializeField] CharacterController CharController;
     [SerializeField] CombatController Combat;
     [SerializeField] List<Transform> Targets;
 

@@ -369,6 +369,7 @@ public class MapGeneration : MonoBehaviour
     [SerializeField] Transform Campfire;
     [SerializeField] RawImage MiniMapImage;
     [SerializeField] EnnemiManager ManagerEnnemis;
+    [SerializeField] ResourceManager ManagerResources;
 
     [Header("Prefabs")]
     [SerializeField] Transform RoomWhere;
