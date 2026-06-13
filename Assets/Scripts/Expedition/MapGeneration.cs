@@ -1,20 +1,50 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.UI;
 
 public class Room
 {
     public RawRoom ReferencedRoom;
+    public Vector2[] NormalizedPositionSpawnEnnemies;
+    public Vector2[] NormalizedPositionSpawnResources;
+    public Vector2 NormalizedPositionSpawnPlayer;
     public TileGroup[,] DualGrid;
     public Mesh GeneratedMesh;
     public Vector2Int DualGridSize;
 
-    public Room(RawRoom raw)
+    public Vector2 GetPlayerSpawn(Vector2 rawRoomScale)
     {
-        ReferencedRoom = raw;
-        DualGridSize = raw.GetSize() + Vector2Int.one;
+        return new Vector2(NormalizedPositionSpawnPlayer.x * rawRoomScale.x, NormalizedPositionSpawnPlayer.y * rawRoomScale.y);
     }
 
-    public void GenerateWithDoors(bool[] Left, bool[] Right, bool[] Top, bool[] Bottom)
+    public IEnumerable<Vector2> EnnemiSpawns(Vector2 rawRoomScale)
+    {
+        foreach (var ennemi in NormalizedPositionSpawnEnnemies)
+        {
+            yield return new Vector2(ennemi.x * rawRoomScale.x, ennemi.y * rawRoomScale.y);
+        }
+    }
+
+    public IEnumerable<Vector2> ResourceSpawns(Vector2 rawRoomScale)
+    {
+        foreach (var resource in NormalizedPositionSpawnResources)
+        {
+            yield return new Vector2(resource.x * rawRoomScale.x, resource.y * rawRoomScale.y);
+        }
+    }
+
+    public Room(RoomDescriptor desc)
+    {
+        ReferencedRoom = desc.Raw;
+        NormalizedPositionSpawnEnnemies = desc.NormalizedPositionSpawnEnnemies.ToArray();
+        NormalizedPositionSpawnResources = desc.NormalizedPositionSpawnResources.ToArray();
+        NormalizedPositionSpawnPlayer = desc.NormalizedPositionSpawnPlayer;
+        DualGridSize = desc.Raw.GetSize() + Vector2Int.one;
+    }
+
+    public void GenerateDualGridWithDoors(bool[] Left, bool[] Right, bool[] Top, bool[] Bottom)
     {
         DualGrid = new TileGroup[DualGridSize.x, DualGridSize.y];
 
@@ -26,13 +56,14 @@ public class Room
             }
         }
 
-        for (int x = 0; x < ReferencedRoom.GetSize().x; x++) {
+        for (int x = 0; x < ReferencedRoom.GetSize().x; x++)
+        {
             for (int y = 0; y < ReferencedRoom.GetSize().y; y++)
             {
-                DualGrid[x, y].TR           = ReferencedRoom.GetTile(x, y);
-                DualGrid[x + 1, y].TL       = ReferencedRoom.GetTile(x, y);
-                DualGrid[x, y + 1].BR       = ReferencedRoom.GetTile(x, y);
-                DualGrid[x + 1, y + 1].BL   = ReferencedRoom.GetTile(x, y);
+                DualGrid[x, y].TR = ReferencedRoom.GetTile(x, y);
+                DualGrid[x + 1, y].TL = ReferencedRoom.GetTile(x, y);
+                DualGrid[x, y + 1].BR = ReferencedRoom.GetTile(x, y);
+                DualGrid[x + 1, y + 1].BL = ReferencedRoom.GetTile(x, y);
             }
 
             DualGrid[x, 0].BR = Bottom[x];
@@ -48,172 +79,609 @@ public class Room
             DualGrid[ReferencedRoom.GetSize().x, x + 1].BR = Right[x];
         }
 
+    }
+
+    public void GenerateMeshWithResolver(TileGroupResolver resolver)
+    {
+        if (DualGrid == null) return;
+
+        Quaternion[] quaternions = new Quaternion[4]
+        {
+            Quaternion.identity,
+            Quaternion.AngleAxis(-90, Vector3.up),
+            Quaternion.AngleAxis(-180, Vector3.up),
+            Quaternion.AngleAxis(-270, Vector3.up),
+        };
+
+        List<CombineInstance> combineInstances = new List<CombineInstance>();
+        for (int x = 0; x < DualGridSize.x; x++)
+        {
+            for (int y = 0; y < DualGridSize.y; y++)
+            {
+                if (DualGrid[x, y].IsEmpty()) continue;
+
+                MeshRotation meshRotation = resolver.Get(DualGrid[x, y]);
+                int random = Random.Range(0, meshRotation.Models.Length);
+                Mesh model = meshRotation.Models[random];
+
+                CombineInstance combine = new CombineInstance();
+                combine.transform = Matrix4x4.TRS(
+                    new Vector3(x + 0.5f, 0, y + 0.5f),
+                    quaternions[meshRotation.Rotation],
+                    new Vector3(0.1f, 0.1f, 0.1f)
+                );
+                combine.mesh = model;
+
+                for (int i = 0; i < model.subMeshCount; ++i)
+                {
+                    combine.subMeshIndex = i;
+                    combineInstances.Add(combine);
+                }
+
+            }
+        }
 
         GeneratedMesh = new Mesh();
-        // TODO : Generate Mesh with tile
+        GeneratedMesh.indexFormat = IndexFormat.UInt32;
+        GeneratedMesh.CombineMeshes(combineInstances.ToArray(), true, true);
+        GeneratedMesh.Optimize();
+        GeneratedMesh.OptimizeIndexBuffers();
+        GeneratedMesh.OptimizeReorderVertexBuffer();
     }
+}
+
+public class MapFactory
+{
+    public int Seed = -1;
+
+    public Vector2 RoomScale;
+    public Vector2Int RoomCount;
+    public Vector2Int TilePerRoom;
+    public int WaterTilingPerRoom;
+
+    public Vector2 RawRoomScale
+    {
+        get
+        {
+            return new Vector2(
+                RoomScale.x * ((float)TilePerRoom.x / (TilePerRoom.x + 1)),
+                RoomScale.y * ((float)TilePerRoom.y / (TilePerRoom.y + 1))
+                );
+        }
+    }
+    public Vector2Int TileGroupPerRoom { get { return TilePerRoom + Vector2Int.one; } }
+    public Vector2 TileScale { get { return new Vector2(RoomScale.x / (float)(TilePerRoom.x), RoomScale.y / (float)(TilePerRoom.y)); } }
+    public Vector2 TileGroupScale { get { return new Vector2(RoomScale.x / (float)(TileGroupPerRoom.x), RoomScale.y / (float)(TileGroupPerRoom.y)); } }
+    public float RoomScaleX { get { return RoomScale.x / TileGroupPerRoom.x; } }
+    public float RoomScaleZ { get { return RoomScale.y / TileGroupPerRoom.y; } }
+
+    RoomSO[] Rooms;
+    RoomResolver ResolverRoom;
+    TileGroupResolver ResolverTileGroup;
+    Room[,] Map;
+    MapLayout Layout;
+
+    public Vector2 StartPosition { get { return Map[0, 0].GetPlayerSpawn(RawRoomScale); } }
+    public Vector2 EndPosition { get { return Map[RoomCount.x - 1, RoomCount.y - 1].GetPlayerSpawn(RawRoomScale) + new Vector2((RoomCount.x - 1) * RoomScale.x, (RoomCount.y - 1) * RoomScale.y); } }
+
+    public Mesh WaterMesh = null;
+
+    public Room GetRoom(int x, int y) => Map[x, y];
+
+    void CreateDoor(int x, int y, out bool[] left, out bool[] right, out bool[] top, out bool[] bottom)
+    {
+        left = new bool[TilePerRoom.y];
+        right = new bool[TilePerRoom.y];
+        top = new bool[TilePerRoom.x];
+        bottom = new bool[TilePerRoom.x];
+
+        int firstLeft = TilePerRoom.y;
+        int lastLeft = 0;
+        int firstRight = TilePerRoom.y;
+        int lastRight = 0;
+        for (int i = 0; i < TilePerRoom.y; i++)
+        {
+            bool currentRoomLeft = Map[x, y].ReferencedRoom.GetTile(0, i);
+            bool currentRoomRight = Map[x, y].ReferencedRoom.GetTile(TilePerRoom.x - 1, i);
+
+            bool otherRoomLeft = (x > 0 ? Map[x - 1, y].ReferencedRoom.GetTile(TilePerRoom.x - 1, i) : false);
+            bool otherRoomRight = (x < RoomCount.x - 1 ? Map[x + 1, y].ReferencedRoom.GetTile(0, i) : false);
+
+            if (currentRoomLeft || otherRoomLeft)
+            {
+                lastLeft = i;
+                if (firstLeft > i)
+                {
+                    firstLeft = i;
+                }
+            }
+
+            if (currentRoomRight || otherRoomRight)
+            {
+                lastRight = i;
+                if (firstRight > i)
+                {
+                    firstRight = i;
+                }
+            }
+        }
+        for (int i = 0; i < TilePerRoom.y; i++)
+        {
+            if (i >= firstLeft && i <= lastLeft) left[i] = true;
+            if (i >= firstRight && i <= lastRight) right[i] = true;
+        }
+
+        int firstTop = TilePerRoom.x;
+        int lastTop = 0;
+        int firstBottom = TilePerRoom.x;
+        int lastBottom = 0;
+        for (int i = 0; i < TilePerRoom.x; i++)
+        {
+            bool currentRoomTop = Map[x, y].ReferencedRoom.GetTile(i, TilePerRoom.y - 1);
+            bool currentRoomBottom = Map[x, y].ReferencedRoom.GetTile(i, 0);
+
+            bool otherRoomTop = (y < RoomCount.y - 1 ? Map[x, y + 1].ReferencedRoom.GetTile(i, 0) : false);
+            bool otherRoomBottom = (y > 0 ? Map[x, y - 1].ReferencedRoom.GetTile(i, TilePerRoom.y - 1) : false);
+
+            if (currentRoomTop || otherRoomTop)
+            {
+                lastTop = i;
+                if (firstTop > i)
+                {
+                    firstTop = i;
+                }
+            }
+
+            if (currentRoomBottom || otherRoomBottom)
+            {
+                lastBottom = i;
+                if (firstBottom > i)
+                {
+                    firstBottom = i;
+                }
+            }
+        }
+        for (int i = 0; i < TilePerRoom.x; i++)
+        {
+            if (i >= firstTop && i <= lastTop) top[i] = true;
+            if (i >= firstBottom && i <= lastBottom) bottom[i] = true;
+        }
+    }
+
+    void GenerateWaterMesh()
+    {
+        WaterMesh = new Mesh();
+
+        int SIZE_X = RoomCount.x * WaterTilingPerRoom;
+        int SIZE_Y = RoomCount.y * WaterTilingPerRoom;
+        int bufferSize = SIZE_X * SIZE_Y;
+        Vector3[] Vertices = new Vector3[bufferSize];
+        Vector2[] UV = new Vector2[bufferSize];
+        Vector3[] Normal = new Vector3[bufferSize];
+        List<int> indices = new List<int>();
+
+        int bufferIndex = 0;
+        for (int x = 0; x < SIZE_X; ++x)
+        {
+            for (int y = 0; y < SIZE_Y; y++)
+            {
+                float Normalized_x = (float)x / (float)(SIZE_X - 1);
+                float Normalized_y = (float)y / (float)(SIZE_Y - 1);
+
+                Vertices[bufferIndex] = new Vector3(Normalized_x * RoomScale.x * RoomCount.x, 0, Normalized_y * RoomScale.y * RoomCount.y);
+                UV[bufferIndex] = new Vector2(Normalized_x, Normalized_y);
+                Normal[bufferIndex] = new Vector3(0, 1, 0);
+
+                int currentIndex = bufferIndex;
+                int NextLineIndex = bufferIndex + SIZE_X;
+                bufferIndex++;
+                if (x == SIZE_X - 1 || y == SIZE_Y - 1) continue;
+
+                // TODO register indices
+                indices.Add(currentIndex);
+                indices.Add(currentIndex + 1);
+                indices.Add(NextLineIndex);
+                indices.Add(currentIndex + 1);
+                indices.Add(NextLineIndex + 1);
+                indices.Add(NextLineIndex);
+            }
+        }
+
+        WaterMesh.SetVertices(Vertices);
+        WaterMesh.SetUVs(0, UV);
+        WaterMesh.SetNormals(Normal);
+        WaterMesh.SetIndices(indices, MeshTopology.Triangles, 0);
+    }
+
+    public void Generate(MeshTileGroup[] meshTileGroups, RoomSO[] rooms)
+    {
+        if (Seed != -1)
+        {
+            Random.InitState(Seed);
+        }
+
+        GenerateWaterMesh();
+
+        Rooms = rooms;
+
+        ResolverRoom = new RoomResolver();
+        ResolverRoom.Process(Rooms, TilePerRoom);
+
+        ResolverTileGroup = new TileGroupResolver();
+        ResolverTileGroup.Process(meshTileGroups);
+
+        Layout = new MapLayout(RoomCount);
+        while (Layout.Solve() == false) { }
+
+        Map = new Room[RoomCount.x, RoomCount.y];
+
+        // TODO : Compute Real Doors
+        bool[] default_door_x = new bool[TileGroupPerRoom.x];
+        bool[] default_door_y = new bool[TileGroupPerRoom.y];
+
+        for (int i = 0; i < TileGroupPerRoom.x; i++) default_door_x[i] = true;
+        for (int i = 0; i < TileGroupPerRoom.y; i++) default_door_y[i] = true;
+
+        for (int x = 0; x < RoomCount.x; ++x)
+        {
+            for (int y = 0; y < RoomCount.y; ++y)
+            {
+                var link = Layout.Layout[x, y];
+                Map[x, y] = new Room(ResolverRoom.GetRoom(link));
+            }
+        }
+
+        for (int x = 0; x < RoomCount.x; ++x)
+        {
+            for (int y = 0; y < RoomCount.y; ++y)
+            {
+                bool[] LeftDoor;
+                bool[] RightDoor;
+                bool[] TopDoor;
+                bool[] BottomDoor;
+                CreateDoor(x, y, out LeftDoor, out RightDoor, out TopDoor, out BottomDoor);
+
+                Map[x, y].GenerateDualGridWithDoors(LeftDoor, RightDoor, TopDoor, BottomDoor);
+                Map[x, y].GenerateMeshWithResolver(ResolverTileGroup);
+            }
+        }
+
+    }
+}
+
+public struct RoomObject
+{
+    public Vector2Int RoomPosition;
+    public Transform Terrain;
+    public Transform Ennemies;
+    public Transform Resources;
 }
 
 public class MapGeneration : MonoBehaviour
 {
+    public static MapGeneration INSTANCE = null;
+
     [Header("References")]
     [SerializeField] MeshTileGroup[] TilesGroups;
     [SerializeField] RoomSO[] Rooms;
+    [SerializeField] Transform Boudaries;
+    [SerializeField] Transform Player;
+    [SerializeField] Transform Campfire;
+    [SerializeField] RawImage MiniMapImage;
+    [SerializeField] EnnemiManager ManagerEnnemis;
+
+    [Header("Prefabs")]
+    [SerializeField] Transform RoomWhere;
+    [SerializeField] GameObject RoomPrefab;
+    [SerializeField] GameObject EnnemiPrefab;
+    [SerializeField] GameObject ResourcePrefab;
+
+    [Header("Water")]
+    [SerializeField] GameObject WaterObject;
+    [SerializeField] int TilingPerRoom;
 
     [Header("Parameters")]
     [SerializeField] Vector2 RoomScale;
     [SerializeField] Vector2Int RoomCount;
     [SerializeField] Vector2Int TilePerRoom;
 
-    Vector2Int TileGroupPerRoom { get { return TilePerRoom + Vector2Int.one; }  }
-    Vector2 TileScale { get { return new Vector2(RoomScale.x / (float)(TilePerRoom.x), RoomScale.y / (float)(TilePerRoom.y)); }  }
-    Vector2 TileGroupScale { get { return new Vector2(RoomScale.x / (float)(TileGroupPerRoom.x), RoomScale.y / (float)(TileGroupPerRoom.y)); }  }
+    [Header("Debug")]
+    [SerializeField] bool DebugTiles;
+    [SerializeField] bool DebugEnnemiAI;
+    [SerializeField] bool GENERATE;
+    [SerializeField] bool DESTROY;
+    [SerializeField] int Seed = -1;
+    [SerializeField] Texture2D MiniMap;
 
-    List<RawRoom> Raws;
-    RoomResolver ResolverRoom;
-    TileGroupResolver ResolverTileGroup;
-    Room[,] Map;
-    MapLayout Layout;
+    MapFactory Factory = null;
+    RoomObject[,] RoomObjects;
 
-    RawRoom RoomSOToRawRoom(RoomSO room)
+    public bool EnnemiAI { get => DebugEnnemiAI; }
+    public int RoomCountX { get => RoomCount.x; }
+    public int RoomCountY { get => RoomCount.y; }
+
+    public float GenerationSizeX { get => RoomCount.x * RoomScale.x; }
+    public float GenerationSizeY { get => RoomCount.y * RoomScale.y; }
+
+    RoomObject CreateRoom(Room room, int x_room, int y_room)
     {
-        // TODO : Allow for different resolution of room
+        RoomObject roomObject = new RoomObject();
 
-        RawRoom output = new RawRoom(room.Size);
-        for(int x = 0; x < room.Size.x; x++)
+        GameObject instance = Instantiate(RoomPrefab, RoomWhere);
+        instance.name = "Room(" + x_room + ", " + y_room + ")";
+        instance.GetComponent<MeshFilter>().sharedMesh = Factory.GetRoom(x_room, y_room).GeneratedMesh;
+        instance.GetComponent<MeshCollider>().sharedMesh = Factory.GetRoom(x_room, y_room).GeneratedMesh;
+
+        float scaleY = (Factory.RoomScaleX + Factory.RoomScaleZ) * 0.5f;
+        instance.transform.localScale = new Vector3(Factory.RoomScaleX, scaleY, Factory.RoomScaleZ);
+        instance.transform.position = new Vector3(RoomScale.x * x_room, 0.0f, RoomScale.y * y_room);
+
+        Vector3 inverse_scale = new Vector3(
+            1 / instance.transform.localScale.x,
+            1 / instance.transform.localScale.y,
+            1 / instance.transform.localScale.z
+            );
+
+        GameObject EnnemiContainer = new GameObject("EnnemiContainer");
+        EnnemiContainer.transform.parent = instance.transform;
+        EnnemiContainer.transform.localScale = inverse_scale;
+
+        GameObject ResourceContainer = new GameObject("ResourceContainer");
+        ResourceContainer.transform.parent = instance.transform;
+        ResourceContainer.transform.localScale = inverse_scale;
+
+        roomObject.Terrain = instance.transform;
+        roomObject.Ennemies = EnnemiContainer.transform;
+        roomObject.Resources = ResourceContainer.transform;
+        roomObject.RoomPosition = new Vector2Int(x_room, y_room);
+
+        return roomObject;
+    }
+
+    Transform CreateResource(Vector3 position, in RoomObject obj)
+    {
+        GameObject instance = Instantiate(ResourcePrefab, obj.Resources);
+
+        float random_offset_x = Random.Range(-Factory.TileGroupScale.x, Factory.TileGroupScale.x) * 0.35f;
+        float random_offset_y = Random.Range(-Factory.TileGroupScale.y, Factory.TileGroupScale.y) * 0.35f;
+        Vector3 random_offset = new Vector3(random_offset_x, 0, random_offset_y);
+
+        instance.transform.position = position + random_offset;
+        return instance.transform;
+    }
+
+    Transform CreateEnnemi(Vector3 position, in RoomObject obj)
+    {
+        GameObject instance = Instantiate(EnnemiPrefab, obj.Ennemies);
+
+        float random_offset_x = Random.Range(-Factory.TileGroupScale.x, Factory.TileGroupScale.x) * 0.35f;
+        float random_offset_y = Random.Range(-Factory.TileGroupScale.y, Factory.TileGroupScale.y) * 0.35f;
+        Vector3 random_offset = new Vector3(random_offset_x, 0, random_offset_y);
+
+        EnnemiController controller = instance.GetComponent<EnnemiController>();
+        CombatController combat = instance.GetComponent<CombatController>();
+
+        controller.InitRoom = obj.RoomPosition;
+        ManagerEnnemis.RegisterEnnemi(combat, controller);
+        instance.name = "Ennemi " + ManagerEnnemis.ENNEMIES_REGISTERED;
+
+        instance.transform.position = position + random_offset;
+        return instance.transform;
+    }
+
+    public void GenerateMiniMapTemp()
+    {
+        int width = RoomCount.x * Factory.TileGroupPerRoom.x * 2;
+        int height = RoomCount.y * Factory.TileGroupPerRoom.y * 2;
+        MiniMap = new Texture2D(width, height, TextureFormat.RGBA32, false);
+        MiniMap.filterMode = FilterMode.Point;
+        MiniMap.wrapMode = TextureWrapMode.Clamp;
+        MiniMap.anisoLevel = 0;
+
+        Color TERRAIN = Color.white;
+        Color WATER = new Color(0, 0, 0, 0);
+
+        for (int x_room = 0; x_room < RoomCount.x; x_room++)
         {
-            for (int y = 0; y < room.Size.y; y++)
+            for (int y_room = 0; y_room < RoomCount.y; y_room++)
             {
-                output.SetTile(x, y, room.Get(x, y));
+
+                int X = x_room * Factory.TileGroupPerRoom.x * 2;
+                int Y = y_room * Factory.TileGroupPerRoom.y * 2;
+                Room ROOM = Factory.GetRoom(x_room, y_room);
+
+                for (int x_tileGroup = 0; x_tileGroup < Factory.TileGroupPerRoom.x; x_tileGroup++)
+                {
+                    for (int y_tileGroup = 0; y_tileGroup < Factory.TileGroupPerRoom.y; y_tileGroup++)
+                    {
+                        int X2 = X + x_tileGroup * 2;
+                        int Y2 = Y + y_tileGroup * 2;
+                        var TILE_GROUP = ROOM.DualGrid[x_tileGroup, y_tileGroup];
+
+                        MiniMap.SetPixel(X2, Y2, TILE_GROUP.BL ? TERRAIN : WATER);
+                        MiniMap.SetPixel(X2 + 1, Y2, TILE_GROUP.BR ? TERRAIN : WATER);
+                        MiniMap.SetPixel(X2, Y2 + 1, TILE_GROUP.TL ? TERRAIN : WATER);
+                        MiniMap.SetPixel(X2 + 1, Y2 + 1, TILE_GROUP.TR ? TERRAIN : WATER);
+                    }
+                }
+
+            }
+        }
+        MiniMap.Apply(false, false);
+
+        MiniMapImage.color = Color.white;
+        MiniMapImage.texture = MiniMap;
+    }
+
+    public void Generate(int seed = -1)
+    {
+        Factory = new MapFactory();
+        Factory.Seed = seed;
+        Factory.RoomCount = RoomCount;
+        Factory.RoomScale = RoomScale;
+        Factory.TilePerRoom = TilePerRoom;
+        Factory.WaterTilingPerRoom = TilingPerRoom;
+
+        Factory.Generate(TilesGroups, Rooms);
+
+        // Water Object :
+        WaterObject.GetComponent<MeshFilter>().sharedMesh = Factory.WaterMesh;
+
+        const float OverScaling = 1.5f;
+        float OverflowX = Factory.RoomCount.x * Factory.RoomScale.x * (OverScaling - 1.0f);
+        float OverflowY = Factory.RoomCount.y * Factory.RoomScale.y * (OverScaling - 1.0f);
+
+        float ScaleY = (Factory.RoomScale.x + Factory.RoomScale.y) * 0.5f;
+
+        WaterObject.transform.position = new Vector3(-OverflowX * 0.5f, -0.1f * ScaleY, -OverflowY * 0.5f);
+        WaterObject.transform.localScale = new Vector3(OverScaling, 1.0f, OverScaling);
+
+        // Room Objects :
+        RoomObjects = new RoomObject[RoomCount.x, RoomCount.y];
+
+        ManagerEnnemis.ForgetEveryRegistered();
+
+        for (int x = 0; x < RoomCount.x; ++x)
+        {
+            for (int y = 0; y < RoomCount.y; ++y)
+            {
+                Room room = Factory.GetRoom(x, y);
+                Vector3 roomPosition = new Vector3(x * RoomScale.x, 0, y * RoomScale.y);
+                RoomObjects[x, y] = CreateRoom(room, x, y);
+                foreach (var ennemi in room.EnnemiSpawns(Factory.RawRoomScale))
+                {
+                    CreateEnnemi(
+                        new Vector3(ennemi.x, 0, ennemi.y) + roomPosition + new Vector3(Factory.TileGroupScale.x, 0, Factory.TileGroupScale.y) * 0.5f,
+                        in RoomObjects[x, y]
+                        );
+                }
+                foreach (var resource in room.ResourceSpawns(Factory.RawRoomScale))
+                {
+                    CreateResource(
+                        new Vector3(resource.x, 0, resource.y) + roomPosition + new Vector3(Factory.TileGroupScale.x, 0, Factory.TileGroupScale.y) * 0.5f,
+                        in RoomObjects[x, y]
+                        );
+                }
             }
         }
 
-        return output;
+        // Camera Boudaries :
+        Vector3 size = new Vector3(2.0f * Factory.RoomScale.x * Factory.RoomCount.x, 1000.0f, 2.0f * Factory.RoomScale.y * Factory.RoomCount.y);
+        Boudaries.GetComponent<BoxCollider>().size = size;
+        Boudaries.transform.position = size * 0.25f + Vector3.down * 100.0f;
+
+        Vector2 start = Factory.StartPosition;
+        Vector2 end = Factory.EndPosition;
+        Player.position = new Vector3(start.x, 0, start.y);
+        Campfire.position = new Vector3(end.x, 0, end.y);
+
+        GenerateMiniMapTemp();
+        ManagerEnnemis.InitWithRegistered();
+    }
+
+    public void DestroyGeneration()
+    {
+        
+        if (RoomObjects != null)
+        {
+            for (int x = 0; x < RoomCount.x; ++x)
+            {
+                for (int y = 0; y < RoomCount.y; ++y)
+                {
+                    while (RoomObjects[x, y].Resources.childCount > 0)
+                    {
+                        DestroyImmediate(RoomObjects[x, y].Resources.GetChild(0).gameObject);
+                    }
+                    while (RoomObjects[x, y].Ennemies.childCount > 0)
+                    {
+                        DestroyImmediate(RoomObjects[x, y].Ennemies.GetChild(0).gameObject);
+                    }
+                    DestroyImmediate(RoomObjects[x, y].Ennemies.gameObject);
+                    DestroyImmediate(RoomObjects[x, y].Resources.gameObject);
+                }
+            }
+        }
+
+        while (RoomWhere.childCount > 0)
+        {
+            DestroyImmediate(RoomWhere.GetChild(0).gameObject);
+        }
+
+        ManagerEnnemis.ForgetEveryRegistered();
+        RoomObjects = null;
+        Factory = null;
+    }
+
+    public void RoomCulling(int x, int y)
+    {
+        if (RoomObjects == null) return;
+        for (int i = 0; i < RoomCount.x; ++i)
+        {
+            for (int j = 0; j < RoomCount.y; ++j)
+            {
+                int dx = Mathf.Abs(i - x);
+                int dy = Mathf.Abs(j - y);
+                RoomObjects[i, j].Terrain.gameObject.SetActive(dx <= 1 && dy <= 1);
+            }
+        }
+    }
+
+    public void OnEnable()
+    {
+        INSTANCE = this;
+    }
+
+    private void OnDisable()
+    {
+        INSTANCE = null;
+    }
+
+    public void Update()
+    {
+        int player_x = (int)(Player.transform.position.x / RoomScale.x);
+        int player_y = (int)(Player.transform.position.z / RoomScale.y);
+        RoomCulling(player_x, player_y);
     }
 
     private void Start()
     {
-        Raws = new List<RawRoom>();
-
-        foreach(var room in Rooms)
+        if (Factory == null)
         {
-            if (room.Size != TilePerRoom) continue;
-            RawRoom raw = RoomSOToRawRoom(room);
-            Raws.Add(raw);
+            Generate();
         }
-
-        ResolverRoom = new RoomResolver();
-        ResolverRoom.Process(Raws, TilePerRoom);
-
-        ResolverTileGroup = new TileGroupResolver();
-        ResolverTileGroup.Process(TilesGroups);
-
-        Layout = new MapLayout(RoomCount);
-        while (Layout.Solve() == false) { }
-
-        Map = new Room[RoomCount.x, RoomCount.y];
-        bool[] default_door_x = new bool[TileGroupPerRoom.x];
-        bool[] default_door_y = new bool[TileGroupPerRoom.y];
-
-        for(int i = 0; i < TileGroupPerRoom.x; i++) default_door_x[i] = true;
-        for(int i = 0; i < TileGroupPerRoom.y; i++) default_door_y[i] = true;
-
-        for(int x = 0; x < RoomCount.x; ++x)
-        {
-            for (int y = 0; y < RoomCount.y; ++y)
-            {
-                var link = Layout.Layout[x, y];
-                Map[x, y] = new Room(ResolverRoom.GetRoom(link).Raw);
-                Map[x, y].GenerateWithDoors(default_door_y, default_door_y, default_door_x, default_door_x);
-            }
-        }
-
     }
 
     private void OnDrawGizmos()
     {
-        if (Layout == null || Map == null) return;
+        if (Factory == null || DebugTiles == false) return;
+        Gizmos.color = new Color(1, 0, 1, 0.5f);
 
-        Vector3 RoomSize = new Vector3(1.0f, 0.0f, 1.0f);
-        Vector3 TileGroupSize = new Vector3(RoomSize.x / (float)TileGroupPerRoom.x, 0.0f, RoomSize.z / (float)TileGroupPerRoom.y);
-        Vector3 TileSize = TileGroupSize * 0.5f;
+        Vector3 Size = new Vector3(Factory.TileScale.x, 0.5f, Factory.TileScale.y);
 
-        for (int x = 0; x < RoomCount.x; x++) {
-            for (int y = 0; y < RoomCount.y; y++)
+        for (int x = 0; x < RoomCount.x; ++x)
+        {
+            for (int y = 0; y < RoomCount.y; ++y)
             {
-                Vector3 roomBottomLeft = new Vector3(x, 0, y);
-                if(Layout.StartingPoint.x == x && Layout.StartingPoint.y == y)
-                {
-                    Gizmos.color = Color.green;
-                }
-                else if(Layout.EndingPoint.x == x && Layout.EndingPoint.y == y)
-                {
-                    Gizmos.color = Color.yellow;
-                }
-                else Gizmos.color = Color.white;
+                Room room = Factory.GetRoom(x, y);
+                Vector3 roomPosition = new Vector3(x * RoomScale.x, 0, y * RoomScale.y);
 
-                Vector3 roomCenter = roomBottomLeft + RoomSize * 0.5f;
-                Gizmos.DrawCube(roomCenter + Vector3.down * 0.1f, RoomSize + Vector3.up * 0.2f);
-
-                for (int x_tile = 0; x_tile < TileGroupPerRoom.x; ++x_tile)
+                for (int x_tile = 0; x_tile < TilePerRoom.x; ++x_tile)
                 {
-                    for (int y_tile = 0; y_tile < TileGroupPerRoom.y; ++y_tile)
+                    for (int y_tile = 0; y_tile < TilePerRoom.y; ++y_tile)
                     {
-                        Vector3 TileBottomLeft = roomBottomLeft + new Vector3(TileGroupSize.x * x_tile, 0.0f, TileGroupSize.z * y_tile);   
-
-                        Gizmos.color = Color.red;
-                        Gizmos.DrawWireCube(TileBottomLeft + TileGroupSize * 0.5f, TileGroupSize + Vector3.up * 0.01f);
-
-                        Gizmos.color = Color.blue;
-                        if (Map[x, y].DualGrid[x_tile, y_tile].BL)
-                        {
-                            Gizmos.DrawCube(TileBottomLeft + new Vector3(0.5f * TileSize.x, 0.0f, 0.5f * TileSize.z), TileSize + Vector3.up * 0.01f);
-                        }
-                        if (Map[x, y].DualGrid[x_tile, y_tile].BR)
-                        {
-                            Gizmos.DrawCube(TileBottomLeft + new Vector3(1.5f * TileSize.x, 0.0f, 0.5f * TileSize.z), TileSize + Vector3.up * 0.01f);
-                        }
-                        if (Map[x, y].DualGrid[x_tile, y_tile].TL)
-                        {
-                            Gizmos.DrawCube(TileBottomLeft + new Vector3(0.5f * TileSize.x, 0.0f, 1.5f * TileSize.z), TileSize + Vector3.up * 0.01f);
-                        }
-                        if (Map[x, y].DualGrid[x_tile, y_tile].TR)
-                        {
-                            Gizmos.DrawCube(TileBottomLeft + new Vector3(1.5f * TileSize.x, 0.0f, 1.5f * TileSize.z), TileSize + Vector3.up * 0.01f);
-                        }
+                        if (room.ReferencedRoom.GetTile(x_tile, y_tile) == false) continue;
+                        Vector3 tilePosition = roomPosition + new Vector3(
+                            Factory.TileGroupScale.x * (x_tile + 0.5f),
+                            0,
+                            Factory.TileGroupScale.y * (y_tile + 0.5f)
+                            );
+                        Gizmos.DrawCube(tilePosition + Size * 0.5f, Size);
                     }
                 }
 
 
             }
         }
-
-        for (int x = 0; x < RoomCount.x; x++)
-        {
-            for (int y = 0; y < RoomCount.y; y++)
-            {
-                Vector3 roomCenter = new Vector3(x, 0, y) + RoomSize * 0.5f;
-
-                Gizmos.color = Color.white;
-                if (Layout.Layout[x, y].Up)
-                {
-                    Gizmos.DrawCube(roomCenter + Vector3.up * 0.2f + Vector3.forward * 0.25f, new Vector3(0.1f, 0.1f, 0.5f));
-                }
-                if (Layout.Layout[x, y].Down)
-                {
-                    Gizmos.DrawCube(roomCenter + Vector3.up * 0.2f + Vector3.back * 0.25f, new Vector3(0.1f, 0.1f, 0.5f));
-                }
-                if (Layout.Layout[x, y].Left)
-                {
-                    Gizmos.DrawCube(roomCenter + Vector3.up * 0.2f + Vector3.left * 0.25f, new Vector3(0.5f, 0.1f, 0.1f));
-                }
-                if (Layout.Layout[x, y].Right)
-                {
-                    Gizmos.DrawCube(roomCenter + Vector3.up * 0.2f + Vector3.right * 0.25f, new Vector3(0.5f, 0.1f, 0.1f));
-                }
-            }
-        }
-
     }
 
 }

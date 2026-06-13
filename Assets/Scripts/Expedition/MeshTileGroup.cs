@@ -22,6 +22,8 @@ public struct TileGroup
         rotated.BR = BL;
         return rotated;
     }
+
+    public bool IsEmpty() {  return !TL && !TR && !BR && !BL; }
 }
 
 [CreateAssetMenu(fileName = "MeshTileGroup", menuName = "ScriptableObject/MeshTileGroup")]

@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 
 public class VillageCameraController : MonoBehaviour
 {
-    Vector3 Target;
+    public GameObject Target;
 
     public float Distance;
     public float CameraSize;
@@ -50,32 +50,32 @@ public class VillageCameraController : MonoBehaviour
         MouseDelta = MouseMove.ReadValue<Vector2>();
         IsDraging = MousePress.IsPressed();
 
-        transform.position = Vector3.Lerp(transform.position, Target - transform.forward * Distance, Speed * Time.deltaTime);
+        transform.position = Vector3.Lerp(transform.position, Target.transform.position - transform.forward * Distance, Speed * Time.deltaTime);
 
         myCamera.orthographicSize = CameraSize;
 
         if (IsDraging) {
-            Target += (ROTATEDX * MouseDelta.x + ROTATEDY * MouseDelta.y) * TargetSpeed * Time.deltaTime;
+            Target.transform.position  += (ROTATEDX * MouseDelta.x + ROTATEDY * MouseDelta.y) * (TargetSpeed * Time.deltaTime);
+            Vector3 tragetPos = Target.transform.position;
+            if (tragetPos.x < 0)
+            {
+                tragetPos.x = 0;
+            }
+            else if (tragetPos.x > BoxHalf.x * 2.0f)
+            {
+                tragetPos.x = BoxHalf.x * 2.0f;
+            }
 
-            if (Target.x < -BoxHalf.x)
+            if (tragetPos.z < 0)
             {
-                Target.x = -BoxHalf.x;
+                tragetPos.z = 0;
             }
-            else if (Target.x > BoxHalf.x)
+            else if (tragetPos.z > BoxHalf.y * 2.0f)
             {
-                Target.x = BoxHalf.x;
+                tragetPos.z = BoxHalf.y * 2.0f;
             }
-
-            if (Target.y < -BoxHalf.y)
-            {
-                Target.y = -BoxHalf.y;
-            }
-            else if (Target.y > BoxHalf.y)
-            {
-                Target.y = BoxHalf.y;
-            }
+            Target.transform.position = tragetPos;
         }
-
     }
 
 }

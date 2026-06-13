@@ -1,114 +1,170 @@
-using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
-public enum BuildingType
+public enum VillageMode
 {
-    Unknown,
-    Maison,
-    Ferme,
-    Forge,
-    BuildingTypeCount
-}
-
-public class BuildingFondation
-{
-    public int X;
-    public int Y;
-    public int Width;
-    public int Height;
-
-    public BuildingFondation(int x, int y, int width, int height)
-    {
-        X = x;
-        Y = y;
-        Width = width;
-        Height = height;
-    }
-}
-
-public class BuildingImage
-{
-    public Texture Texture;
-    public Vector3 Offset;
-    public Vector3 Scale;
-
-    public BuildingImage(Texture texture, Vector3 offset, Vector3 scale)
-    {
-        Texture = texture;
-        Offset = offset;
-        Scale = scale;
-    }
-}
-
-public class BuildingInstance
-{
-    public List<BuildingInstance> Holder;
-    public BuildingFondation Fondation;
-    public BuildingImage Image;
-    public int Function;
-}
-
-public class VillageGrid15x15
-{
-    public const int GridWidth = 15;
-    public const int GridHeight = 15;
-    int[,] GridOccupied;
-    int X;
-    int Y;
-
-    public VillageGrid15x15(int x, int y)
-    {
-        GridOccupied = new int[GridWidth, GridHeight];
-
-        X = x;
-        Y = y;
-        for (int i = 0; i < GridWidth; i++)
-        {
-            for(int j = 0; j < GridHeight; j++)
-            {
-                GridOccupied[i, j] = -1;
-            }
-        }
-    } 
-
-    public bool CheckIfRectFree(BuildingFondation fondation)
-    {
-        for(int x = fondation.X; x <= fondation.X + fondation.Width; x++)
-        {
-            for (int y = fondation.Y; y <= fondation.Y + fondation.Height; y++)
-            {
-                if (GridOccupied[x, y] != -1) return false;
-            }
-        }
-        return true;
-    }
+    View,
+    Edit,
+    Placement
 }
 
 public class VillageManager : MonoBehaviour
 {
-    List<BuildingInstance> Buildings;
-    List<VillageGrid15x15> Grids;
 
-    bool CheckIfRectFree(BuildingFondation fondation)
+    [Header("Buildings")]
+    public List<Building>           BuildingObjects = new();
+    public List<GlobalBuildingData> GlobalBuildingData = new();
+    public Transform                BuildingsContainer;
+    public Transform                BuildingsUIContainer;
+
+    public BuildingScript SelectedBuilding;
+    public int PlacingBuildingIndex = -1;
+
+    public int CurrentCityLevel = 1;
+
+    [Space(10)]
+    public Grid Grid;
+    public VillageMode CurrentMode;
+
+    [Header("UI")]
+    public UiManager UiManager;
+
+    [Header("Debug")]
+    public GameObject DebugCube;
+
+    private List<GameObject> BuildingTemplate = new();
+
+    public Action<VillageManager> OnVillageLevelUp;
+    public Action<Building> OnBuildingPlaced;
+
+    private void Start()
     {
-        foreach (VillageGrid15x15 grid in Grids) {
-            if (grid.CheckIfRectFree(fondation) == false) return false;
+        Grid.Create();
+
+        GameObject container = new GameObject("Templates");
+        container.transform.parent = BuildingsContainer;
+        for (var i = 0; i < BuildingObjects.Count; i++)
+        {
+            Building desc = BuildingObjects[i];
+            GlobalBuildingData.Add(desc.GlobalBuildingData);
+            GlobalBuildingData globalBuildingData = GlobalBuildingData[i];
+            for (int level = 0; level < CurrentCityLevel; level++)
+            {
+                globalBuildingData.BaseBuildingCount += globalBuildingData.PerLevelExtention[level];
+            }
+            GameObject template = Instantiate(desc.Prefab, container.transform);
+            template.SetActive(false);
+            BuildingTemplate.Add(template);
         }
-        return true;
+
     }
 
-    public bool TryRegisterBuilding(int x, int y)
+    private void Update()
     {
-        BuildingFondation fondation = new BuildingFondation(x, y, 1, 1);
-        if (CheckIfRectFree(fondation) == false) return false;
+        UpdateView();
 
-        BuildingInstance instance = new BuildingInstance();
-        instance.Holder = Buildings;
-        instance.Fondation = fondation;
-        instance.Image = new BuildingImage(null, Vector3.zero, Vector3.one);
-
-        return true;
+        UpdatePlacement();
     }
 
+    private void UpdateView()
+    {
+        if (CurrentMode != VillageMode.View)
+            return;
+        if (Mouse.current.leftButton.wasPressedThisFrame)
+        {
+            if (Grid.CursorToGrid( out Vector2 gridPos))
+            {
+                if (EventSystem.current.IsPointerOverGameObject())
+                    return;
+
+                Tile tile = Grid.GetTile(gridPos);
+
+                if (tile.BuildingScript != null)
+                {
+                    SelectedBuilding = tile.BuildingScript;
+                    tile.BuildingScript.OnClick();
+                }
+                else
+                {
+                    if (SelectedBuilding != null)
+                    {
+                        SelectedBuilding.OnUnselected();
+                        SelectedBuilding = null;
+                    }
+                }
+            }
+        }
+    }
+
+    private void UpdatePlacement()
+    {
+        if (CurrentMode != VillageMode.Placement)
+            return;
+
+        if (PlacingBuildingIndex == -1)
+            return;
+
+        if (Grid.CursorToGrid(out Vector2 gridPos))
+        {
+            // Build preview
+            if (!Grid.IsOccupied(gridPos, BuildingObjects[PlacingBuildingIndex].Fondation))
+            {
+                BuildingTemplate[PlacingBuildingIndex].SetActive(true);
+                BuildingTemplate[PlacingBuildingIndex].transform.position = new (gridPos.x, 0, gridPos.y);
+            }
+
+            // Cursor
+            DebugCube.transform.position = Grid.GridToWorld(gridPos);
+
+            // Placement
+            if (Mouse.current.leftButton.wasPressedThisFrame)
+            {
+                Grid.PlaceBuilding(gridPos, BuildingObjects[PlacingBuildingIndex], BuildingsUIContainer);
+                StopPlacing();
+            }
+        }
+
+        if (Keyboard.current.vKey.wasPressedThisFrame)
+        {
+            LevelUpCity();
+        }
+    }
+
+    public void StartPlacing(int index)
+    {
+        PlacingBuildingIndex = index;
+        ToPlacementMode();
+    }
+
+    public void StopPlacing()
+    {
+        ToViewMode();
+        PlacingBuildingIndex = -1;
+    }
+
+    public void ToViewMode() {
+        BuildingTemplate[PlacingBuildingIndex].SetActive(false);
+        ChangeMode(VillageMode.View);
+    }
+    public void ToPlacementMode() => ChangeMode(VillageMode.Placement);
+    public void ToEditMode()  => ChangeMode(VillageMode.Edit);
+
+    public void ChangeMode(VillageMode mode)
+    {
+        CurrentMode = mode;
+        UiManager.Activate(mode);
+    }
+
+    public void LevelUpCity()
+    {
+        CurrentCityLevel++;
+        for (var i = 0; i < GlobalBuildingData.Count; i++)
+        {
+            GlobalBuildingData[i].BaseBuildingCount += GlobalBuildingData[i].PerLevelExtention[CurrentCityLevel];
+        }
+    }
 }
