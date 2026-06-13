@@ -6,7 +6,8 @@ public abstract class BuildingScript : MonoBehaviour
     [SerializeField]
     public GameObject BuildingUIPrefab;
 
-    [SerializeField] private BuildingsUI BuildingUI; 
+    [SerializeField]
+    private BuildingsUI BuildingUI;
 
     public BuildingsUI UI => BuildingUI;
 

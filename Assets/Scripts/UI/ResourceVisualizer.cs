@@ -31,7 +31,7 @@ public class ResourceVisualizer : MonoBehaviour
     // TODO : Remove on release
     void Update()
     {
-        if(UPDATE)
+        if(UPDATE && Inventory.Instance)
         {
             UpdateVisualizer(Inventory.Instance.GetResource(resourceType), Icon);
         }
@@ -39,6 +39,7 @@ public class ResourceVisualizer : MonoBehaviour
 
     void Start()
     {
+        if (!Inventory.Instance) return;
         UpdateQte(Inventory.Instance.GetResource(resourceType));
         UpdateIcon(Icon);
     }

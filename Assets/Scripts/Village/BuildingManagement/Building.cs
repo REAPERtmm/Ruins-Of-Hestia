@@ -17,6 +17,15 @@ public class BuildingVisual
 }
 
 [Serializable]
+public class GlobalBuildingData
+{
+    public int BuildingDuration;
+
+    public int BaseBuildingCount;
+    public int[] PerLevelExtention;
+}
+
+[Serializable]
 [CreateAssetMenu(fileName = "Building", menuName = "Building", order = 1)]
 public class Building : ScriptableObject
 {
@@ -24,4 +33,5 @@ public class Building : ScriptableObject
     public GameObject Prefab;
     public BuildingFondation Fondation;
     public BuildingVisual Visual;
+    public GlobalBuildingData GlobalBuildingData;
 }

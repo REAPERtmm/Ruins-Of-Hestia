@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -15,12 +16,15 @@ public class VillageManager : MonoBehaviour
 {
 
     [Header("Buildings")]
-    public List<Building> BuildingObjects = new();
-    public Transform BuildingsContainer;
-    public Transform BuildingsUIContainer;
+    public List<Building>           BuildingObjects = new();
+    public List<GlobalBuildingData> GlobalBuildingData = new();
+    public Transform                BuildingsContainer;
+    public Transform                BuildingsUIContainer;
 
     public BuildingScript SelectedBuilding;
     public int PlacingBuildingIndex = -1;
+
+    public int CurrentCityLevel = 1;
 
     [Space(10)]
     public Grid Grid;
@@ -34,6 +38,9 @@ public class VillageManager : MonoBehaviour
 
     private List<GameObject> BuildingTemplate = new();
 
+    public Action<VillageManager> OnVillageLevelUp;
+    public Action<Building> OnBuildingPlaced;
+
     private void Start()
     {
         Grid.Create();
@@ -43,6 +50,12 @@ public class VillageManager : MonoBehaviour
         for (var i = 0; i < BuildingObjects.Count; i++)
         {
             Building desc = BuildingObjects[i];
+            GlobalBuildingData.Add(desc.GlobalBuildingData);
+            GlobalBuildingData globalBuildingData = GlobalBuildingData[i];
+            for (int level = 0; level < CurrentCityLevel; level++)
+            {
+                globalBuildingData.BaseBuildingCount += globalBuildingData.PerLevelExtention[level];
+            }
             GameObject template = Instantiate(desc.Prefab, container.transform);
             template.SetActive(false);
             BuildingTemplate.Add(template);
@@ -61,7 +74,6 @@ public class VillageManager : MonoBehaviour
     {
         if (CurrentMode != VillageMode.View)
             return;
-
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
             if (Grid.CursorToGrid( out Vector2 gridPos))
@@ -111,11 +123,14 @@ public class VillageManager : MonoBehaviour
             // Placement
             if (Mouse.current.leftButton.wasPressedThisFrame)
             {
-                Grid.PlaceBuilding(gridPos, BuildingObjects[PlacingBuildingIndex]);
-                Grid.GetTile(gridPos).BuildingScript.Instantiate( BuildingsUIContainer );
-                BuildingTemplate[PlacingBuildingIndex].SetActive(false);
-                ToViewMode();
+                Grid.PlaceBuilding(gridPos, BuildingObjects[PlacingBuildingIndex], BuildingsUIContainer);
+                StopPlacing();
             }
+        }
+
+        if (Keyboard.current.vKey.wasPressedThisFrame)
+        {
+            LevelUpCity();
         }
     }
 
@@ -127,11 +142,14 @@ public class VillageManager : MonoBehaviour
 
     public void StopPlacing()
     {
-        PlacingBuildingIndex = -1;
         ToViewMode();
+        PlacingBuildingIndex = -1;
     }
 
-    public void ToViewMode() => ChangeMode(VillageMode.View);
+    public void ToViewMode() {
+        BuildingTemplate[PlacingBuildingIndex].SetActive(false);
+        ChangeMode(VillageMode.View);
+    }
     public void ToPlacementMode() => ChangeMode(VillageMode.Placement);
     public void ToEditMode()  => ChangeMode(VillageMode.Edit);
 
@@ -139,5 +157,14 @@ public class VillageManager : MonoBehaviour
     {
         CurrentMode = mode;
         UiManager.Activate(mode);
+    }
+
+    public void LevelUpCity()
+    {
+        CurrentCityLevel++;
+        for (var i = 0; i < GlobalBuildingData.Count; i++)
+        {
+            GlobalBuildingData[i].BaseBuildingCount += GlobalBuildingData[i].PerLevelExtention[CurrentCityLevel];
+        }
     }
 }

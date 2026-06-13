@@ -100,7 +100,7 @@ public class Grid
         return occupied;
     }
 
-    public bool PlaceBuilding(Vector2 position, Building building)
+    public bool PlaceBuilding(Vector2 position, Building building, Transform buildingUiContainer)
     {
         if ( IsOccupied(position, building.Fondation) )
             return false;
@@ -116,6 +116,8 @@ public class Grid
                 _tiles[x, y].BuildingScript = script;
             }
         }
+        script.Instantiate( buildingUiContainer );
+
         return true;
     }
 
