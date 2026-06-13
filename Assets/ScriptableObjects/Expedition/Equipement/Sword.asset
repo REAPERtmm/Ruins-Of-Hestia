@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Equipement
   EquipmentName: Sword
   Icon: {fileID: 21300000, guid: 5a53b361a24708c46be203d2263ead66, type: 3}
-  Tier: 2
+  Tier: 4
   Slot: 5
   BaseStats:
   - Stat: 7
@@ -32,4 +32,4 @@ MonoBehaviour:
   - Stat: 11
     Value: 1
     Unit: 4
-  InnateMythicEffect: 0
+  InnateMythicEffect: 6

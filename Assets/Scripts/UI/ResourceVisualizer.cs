@@ -33,14 +33,14 @@ public class ResourceVisualizer : MonoBehaviour
     {
         if(UPDATE && Inventory.Instance)
         {
-            UpdateVisualizer(Inventory.Instance.GetResource(resourceType), Icon);
+            UpdateVisualizer(Inventory.Instance.GetResourceAmount(resourceType), Icon);
         }
     }
 
     void Start()
     {
         if (!Inventory.Instance) return;
-        UpdateQte(Inventory.Instance.GetResource(resourceType));
+        UpdateQte(Inventory.Instance.GetResourceAmount(resourceType));
         UpdateIcon(Icon);
     }
 

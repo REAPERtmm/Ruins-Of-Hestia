@@ -2173,6 +2173,66 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!1 &4408274851348599778
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2837909083813541170}
+  - component: {fileID: 1616644798777983560}
+  m_Layer: 5
+  m_Name: GemsCost
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &2837909083813541170
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4408274851348599778}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5190455097939011538}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: -200}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1616644798777983560
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4408274851348599778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a8695521f0d02e499659fee002a26c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GridLayoutGroup
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 4
+  m_StartCorner: 0
+  m_StartAxis: 0
+  m_CellSize: {x: 100, y: 100}
+  m_Spacing: {x: 0, y: 0}
+  m_Constraint: 2
+  m_ConstraintCount: 1
 --- !u!1 &4884600872431558415
 GameObject:
   m_ObjectHideFlags: 0
@@ -3367,7 +3427,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &5190455097939011538
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3384,6 +3444,7 @@ RectTransform:
   - {fileID: 4113351691002625567}
   - {fileID: 6099885860590380875}
   - {fileID: 1497312494664686378}
+  - {fileID: 2837909083813541170}
   m_Father: {fileID: 7410686453943780070}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -3407,6 +3468,7 @@ MonoBehaviour:
   RollButton: {fileID: 8960274485062897199}
   forgeUI: {fileID: 6654884877716713630}
   TraitInformationTransform: {fileID: 6099885860590380875}
+  TraitCostInformationTransform: {fileID: 2837909083813541170}
 --- !u!114 &1873562997024686263
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3421,6 +3483,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RollCostUI
   Tier: {fileID: 3723980799912635385}
   TraitPrefab: {fileID: 4484601847589779312, guid: e7bcf39ba50761a438df38ec8f92e60a, type: 3}
+  Image:
+  - Type: 0
+    Sprite: {fileID: 21300000, guid: 10f23793093aeb7499b983aac319d76c, type: 3}
+  - Type: 1
+    Sprite: {fileID: 21300000, guid: 288691cea9442ca4da08a105140a1f1f, type: 3}
+  - Type: 2
+    Sprite: {fileID: 21300000, guid: fec8db5017aed0942ab40816118d028d, type: 3}
+  - Type: 3
+    Sprite: {fileID: 21300000, guid: a09a6ba32c8de3e41b1eb1df728bbba5, type: 3}
+  - Type: 4
+    Sprite: {fileID: 21300000, guid: b64f3cea6b45c354498fe5e963e9ddb9, type: 3}
+  - Type: 5
+    Sprite: {fileID: 21300000, guid: 683a8149da980c6438e5e623b362cadf, type: 3}
 --- !u!1 &6929326387988964457
 GameObject:
   m_ObjectHideFlags: 0

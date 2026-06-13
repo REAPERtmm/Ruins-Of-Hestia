@@ -61,14 +61,14 @@ public class Inventory : MonoBehaviour
         equipments.Remove(equipment);
     }
 
-    public int GetResource(ResourceType type)
+    public int GetResourceAmount(ResourceType type)
     {
         ResourceStack stack = resources.Find(x => x.Type == type);
 
         return stack == null ? 0 : stack.Amount;
     }
     
-    public int GetResource(GemType type)
+    public int GetGemAmount(GemType type)
     {
         GemStack stack = gems.Find(x => x.Type == type);
 
@@ -143,7 +143,7 @@ public class Inventory : MonoBehaviour
     {
         foreach (ResourcesCost cost in costs)
         {
-            if (GetResource(cost.Type) < cost.Qte)
+            if (GetResourceAmount(cost.Type) < cost.Qte)
                 return false;
         }
 
@@ -153,7 +153,9 @@ public class Inventory : MonoBehaviour
     {
         foreach (GemsCost cost in costs)
         {
-            if (GetResource(cost.Type) < cost.Qte)
+            int availableAmount = GetGemAmount(cost.Type);
+
+            if (availableAmount < cost.Qte)
                 return false;
         }
 

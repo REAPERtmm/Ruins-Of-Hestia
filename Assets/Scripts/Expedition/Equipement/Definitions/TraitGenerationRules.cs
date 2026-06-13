@@ -1,9 +1,12 @@
-﻿using System; 
+﻿using JetBrains.Annotations;
+using System; 
 
 [Serializable]
 public class TraitGenerationRule
 {
     public StatName Stat;
+
+    public GemsCost Cost;
 
     public bool AllowFlat;
 

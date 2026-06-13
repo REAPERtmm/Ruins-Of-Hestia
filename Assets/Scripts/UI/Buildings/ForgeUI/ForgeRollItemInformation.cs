@@ -1,7 +1,8 @@
 using NUnit.Framework;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
 
 public class ForgeRollItemInformation : MonoBehaviour
 {
@@ -12,6 +13,8 @@ public class ForgeRollItemInformation : MonoBehaviour
     [SerializeField] private ForgeUI forgeUI;
 
     [SerializeField] private Transform TraitInformationTransform;
+
+    [SerializeField] private Transform TraitCostInformationTransform;
 
     private List<GemsCost> Costs = new();
     private EquipmentInstance Equipement;
@@ -25,7 +28,36 @@ public class ForgeRollItemInformation : MonoBehaviour
         CostUI.SetTier(equipement.Definition.Tier);
         CostUI.SetTrait(TraitInformationTransform);
 
+        UnsubscribeFromTraitEvents();
+
         Equipement = equipement;
+
+        SubscribeToTraitEvents(); 
+    }
+
+    private void SubscribeToTraitEvents()
+    {
+        foreach (var trait in Equipement.Traits)
+        {
+            trait.OnLockChanged -= OnTraitLockChanged; 
+            trait.OnLockChanged += OnTraitLockChanged;
+        }
+    }
+
+    private void UnsubscribeFromTraitEvents()
+    {
+        if (Equipement == null)
+            return;
+
+        foreach (var trait in Equipement.Traits)
+        {
+            trait.OnLockChanged -= OnTraitLockChanged;
+        }
+    }
+
+    private void OnTraitLockChanged(TraitInstance trait)
+    {
+        CostUI.SetGemCost(TraitCostInformationTransform, Costs); 
     }
 
     public void StartRoll()
@@ -41,6 +73,8 @@ public class ForgeRollItemInformation : MonoBehaviour
             Inventory.Instance.RemoveResource(cost.Type, cost.Qte);
         }
 
+        UnsubscribeFromTraitEvents();
+
         Forge forge = forgeUI.GetForge();
         if (forge != null)
         {
@@ -48,6 +82,8 @@ public class ForgeRollItemInformation : MonoBehaviour
         }
 
         CostUI.SetTrait(TraitInformationTransform);
+
+        SubscribeToTraitEvents();
     }
 
     public void Update()
@@ -56,7 +92,7 @@ public class ForgeRollItemInformation : MonoBehaviour
         {
             RollButton.interactable = true;
             return;
-        }
+        } 
 
         if (!Inventory.Instance.CanAfford(Costs))
         {
@@ -65,5 +101,5 @@ public class ForgeRollItemInformation : MonoBehaviour
         }
 
         RollButton.interactable = true;
-    }
+    } 
 }
