@@ -22,6 +22,6 @@ MonoBehaviour:
     Active: {fileID: 2100000, guid: cae54cc0ad86323469112f976f2f1a40, type: 2}
     Default: {fileID: 2100000, guid: 685c9d723f3b10b449d42aa097f6fd0e, type: 2}
   GlobalBuildingData:
-    BuildingDuration: 0
+    BuildingDuration: 4
     BaseBuildingCount: 0
     PerLevelExtention: 

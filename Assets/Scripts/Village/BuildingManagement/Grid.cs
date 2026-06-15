@@ -13,6 +13,7 @@ public class BuildingData
 {
     public Building Descriptor;
     public Vector2 Position;
+    public int DayLeftToBuild;
 }
 
 public class Tile
@@ -33,6 +34,7 @@ public class Grid
     public int Height = 60;
 
     public GameObject GridPreview;
+    public Material GridMaterial;
 
     private Tile[,] _tiles;
 
@@ -113,6 +115,7 @@ public class Grid
         BuildingData data = new BuildingData();
         data.Descriptor = building;
         data.Position = position;
+        data.DayLeftToBuild = building.GlobalBuildingData.BuildingDuration;
         BuildingPlaced.Add(data);
         script.Data = data;
         for (int x = (int)position.x; x <= position.x + building.Fondation.Width; ++x) {
@@ -123,6 +126,7 @@ public class Grid
             }
         }
         gameObject.transform.GetChild(0).gameObject.SetActive(false);
+        gameObject.transform.GetChild(1).gameObject.SetActive(false);
         script.Instantiate( buildingUiContainer );
         script.OnUnselected();
         BuildingScripts.Add( script );

@@ -71,13 +71,10 @@ public class VillageManager : MonoBehaviour
     {
         if (Keyboard.current.f3Key.wasPressedThisFrame)
         {
-            foreach (var buildingScript in Grid.BuildingScripts)
-            {
-                buildingScript.PassDay();
-            }
+            PassDay();
         }
 
-            UpdateView();
+        UpdateView();
 
         UpdatePlacement();
     }
@@ -188,6 +185,15 @@ public class VillageManager : MonoBehaviour
         for (var i = 0; i < GlobalBuildingData.Count; i++)
         {
             GlobalBuildingData[i].BaseBuildingCount += GlobalBuildingData[i].PerLevelExtention[CurrentCityLevel];
+        }
+    }
+
+    public void PassDay()
+    {
+
+        foreach (var buildingScript in Grid.BuildingScripts)
+        {
+            buildingScript.PassDay();
         }
     }
 }

@@ -33,6 +33,7 @@ public class Forge : BuildingScript
     public override void PassDay() 
     {
         Debug.Log("PassDay");
+        base.PassDay();
 
         for (int i = Jobs.Count - 1; i >= 0; i--)
         {
