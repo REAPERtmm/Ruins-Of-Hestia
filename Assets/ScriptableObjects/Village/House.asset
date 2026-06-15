@@ -13,7 +13,15 @@ MonoBehaviour:
   m_Name: House
   m_EditorClassIdentifier: Assembly-CSharp::BuildingDescriptor
   Name: House
-  Prefab: {fileID: 8660684453734734046, guid: 5e3475186675862418b0270518209e54, type: 3}
+  Prefab: {fileID: 1074613482907823185, guid: 4461489a876ed184facd1226a7eda930, type: 3}
   Fondation:
     Width: 3
     Height: 3
+  Visual:
+    Preview: {fileID: 0}
+    Active: {fileID: 2100000, guid: 6fdbb1770af3fa34bb84f7969835feb1, type: 2}
+    Default: {fileID: 2100000, guid: f6d29df966682d3438b56c94d6eb1764, type: 2}
+  GlobalBuildingData:
+    BuildingDuration: 0
+    BaseBuildingCount: 0
+    PerLevelExtention: 

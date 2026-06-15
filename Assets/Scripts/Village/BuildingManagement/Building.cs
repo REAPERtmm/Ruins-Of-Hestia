@@ -14,6 +14,8 @@ public class BuildingFondation
 public class BuildingVisual
 {
     public Sprite Preview;
+    public Material Active;
+    public Material Default;
 }
 
 [Serializable]

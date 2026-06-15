@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: BuildingView
+  m_Name: ACTIVE House View
   m_Shader: {fileID: -6465566751694194690, guid: a5d38c795aa5adb4d8070ddfde2d1a6b, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -37,7 +37,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _Building:
-        m_Texture: {fileID: 2800000, guid: 40cbdcaad1babfd4386462362c2bccc6, type: 3}
+        m_Texture: {fileID: 2800000, guid: 7580bba247333a042bd7683c08122b12, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:

@@ -11,8 +11,8 @@ public enum OccupationType
 
 public class BuildingData
 {
-    Building Descriptor;
-    Vector2 Position;
+    public Building Descriptor;
+    public Vector2 Position;
 }
 
 public class Tile
@@ -30,6 +30,8 @@ public class Grid
 
     public int Width = 60;
     public int Height = 60;
+
+    public GameObject GridPreview;
 
     private Tile[,] _tiles;
 
@@ -70,7 +72,7 @@ public class Grid
         return true;
     }
 
-    public Vector3 GridToWorld(Vector2 gridPos) => new Vector3(gridPos.x, 0, gridPos.y);
+    public Vector3 GridToWorld(Vector2 gridPos) => new Vector3(gridPos.x, 0.1f, gridPos.y);
 
     public bool CursorToGrid(out Vector2 point)
     {
@@ -108,7 +110,10 @@ public class Grid
         GameObject gameObject = Object.Instantiate(building.Prefab, GridToWorld(position), Quaternion.identity);
         BuildingScript script = gameObject.GetComponentInChildren<BuildingScript>();
         BuildingData data = new BuildingData();
+        data.Descriptor = building;
+        data.Position = position;
         BuildingPlaced.Add(data);
+        script.Data = data;
         for (int x = (int)position.x; x <= position.x + building.Fondation.Width; ++x) {
             for (int y = (int)position.y; y <= position.y + building.Fondation.Height; ++y) {
                 _tiles[x, y].Occupation = OccupationType.Building;
@@ -116,8 +121,9 @@ public class Grid
                 _tiles[x, y].BuildingScript = script;
             }
         }
+        gameObject.transform.GetChild(0).gameObject.SetActive(false);
         script.Instantiate( buildingUiContainer );
-
+        script.OnUnselected();
         return true;
     }
 
@@ -126,5 +132,14 @@ public class Grid
         return _tiles[(int)position.x, (int)position.y];
     }
 
+    public void Show()
+    {
+        GridPreview.SetActive(true);
+    }
+
+    public void Hide()
+    {
+        GridPreview.SetActive(false);
+    }
 
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -21,20 +22,21 @@ public class VillageManager : MonoBehaviour
     public Transform                BuildingsContainer;
     public Transform                BuildingsUIContainer;
 
+    public Selector     Selector;
+
+    [Space(10)]
+    public Grid         Grid;
+    public VillageMode  CurrentMode;
+
+    [Header("UI")]
+    public UiManager    UiManager;
+
+    [Header("Debug")]
+    public GameObject   DebugCube;
     public BuildingScript SelectedBuilding;
     public int PlacingBuildingIndex = -1;
 
     public int CurrentCityLevel = 1;
-
-    [Space(10)]
-    public Grid Grid;
-    public VillageMode CurrentMode;
-
-    [Header("UI")]
-    public UiManager UiManager;
-
-    [Header("Debug")]
-    public GameObject DebugCube;
 
     private List<GameObject> BuildingTemplate = new();
 
@@ -43,6 +45,8 @@ public class VillageManager : MonoBehaviour
 
     private void Start()
     {
+        DOTween.Init();
+
         Grid.Create();
 
         GameObject container = new GameObject("Templates");
@@ -74,6 +78,7 @@ public class VillageManager : MonoBehaviour
     {
         if (CurrentMode != VillageMode.View)
             return;
+
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
             if (Grid.CursorToGrid( out Vector2 gridPos))
@@ -110,18 +115,22 @@ public class VillageManager : MonoBehaviour
 
         if (Grid.CursorToGrid(out Vector2 gridPos))
         {
+
+            bool isAvailable = !Grid.IsOccupied(gridPos, BuildingObjects[PlacingBuildingIndex].Fondation);
+
             // Build preview
-            if (!Grid.IsOccupied(gridPos, BuildingObjects[PlacingBuildingIndex].Fondation))
-            {
-                BuildingTemplate[PlacingBuildingIndex].SetActive(true);
-                BuildingTemplate[PlacingBuildingIndex].transform.position = new (gridPos.x, 0, gridPos.y);
-            }
+            BuildingTemplate[PlacingBuildingIndex].SetActive(true);
+            BuildingTemplate[PlacingBuildingIndex].transform.position = new (gridPos.x, 0, gridPos.y);
+            float halfX = BuildingObjects[PlacingBuildingIndex].Fondation.Width/2.0f;
+            float halfY = BuildingObjects[PlacingBuildingIndex].Fondation.Height / 2.0f; // TODO Pass this in selector
+            Selector.Resize( new Vector3( gridPos.x + halfX, 0.1f, gridPos.y + halfY), new Vector2(halfX, halfY) );
+            Selector.SetGroundColor( BuildingTemplate[PlacingBuildingIndex], isAvailable );
 
             // Cursor
             DebugCube.transform.position = Grid.GridToWorld(gridPos);
 
             // Placement
-            if (Mouse.current.leftButton.wasPressedThisFrame)
+            if (Mouse.current.leftButton.wasPressedThisFrame && isAvailable)
             {
                 Grid.PlaceBuilding(gridPos, BuildingObjects[PlacingBuildingIndex], BuildingsUIContainer);
                 StopPlacing();
@@ -137,20 +146,26 @@ public class VillageManager : MonoBehaviour
     public void StartPlacing(int index)
     {
         PlacingBuildingIndex = index;
+        Selector.Show();
         ToPlacementMode();
     }
 
     public void StopPlacing()
     {
         ToViewMode();
+        Selector.Hide();
         PlacingBuildingIndex = -1;
     }
 
     public void ToViewMode() {
         BuildingTemplate[PlacingBuildingIndex].SetActive(false);
+        Grid.Hide();
         ChangeMode(VillageMode.View);
     }
-    public void ToPlacementMode() => ChangeMode(VillageMode.Placement);
+    public void ToPlacementMode() {
+        ChangeMode(VillageMode.Placement);
+        Grid.Show();
+    }
     public void ToEditMode()  => ChangeMode(VillageMode.Edit);
 
     public void ChangeMode(VillageMode mode)

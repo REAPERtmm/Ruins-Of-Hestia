@@ -6,6 +6,11 @@ public abstract class BuildingScript : MonoBehaviour
     [SerializeField]
     public GameObject BuildingUIPrefab;
 
+    public BuildingData Data;
+
+    [SerializeField]
+    private BuildingView BuildingView;
+
     [SerializeField]
     private BuildingsUI BuildingUI;
 
@@ -19,11 +24,13 @@ public abstract class BuildingScript : MonoBehaviour
 
     public virtual void OnClick()
     {
+        BuildingView.SetSelected( Data.Descriptor.Visual, true );
         BuildingUI.Open(this);
     }
 
     public virtual void OnUnselected()
     {
+        BuildingView.SetSelected( Data.Descriptor.Visual, false );
         BuildingUI.Close();
     }
 

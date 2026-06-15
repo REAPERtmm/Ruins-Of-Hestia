@@ -13,7 +13,15 @@ MonoBehaviour:
   m_Name: Forge
   m_EditorClassIdentifier: Assembly-CSharp::BuildingDescriptor
   Name: Forge
-  Prefab: {fileID: 1074613482907823185, guid: 4461489a876ed184facd1226a7eda930, type: 3}
+  Prefab: {fileID: 1074613482907823185, guid: dc47c9084d6df7344be6c88161f6c51f, type: 3}
   Fondation:
     Width: 3
     Height: 3
+  Visual:
+    Preview: {fileID: 0}
+    Active: {fileID: 2100000, guid: cae54cc0ad86323469112f976f2f1a40, type: 2}
+    Default: {fileID: 2100000, guid: 685c9d723f3b10b449d42aa097f6fd0e, type: 2}
+  GlobalBuildingData:
+    BuildingDuration: 0
+    BaseBuildingCount: 0
+    PerLevelExtention: 
