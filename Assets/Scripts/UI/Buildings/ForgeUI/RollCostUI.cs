@@ -74,7 +74,8 @@ public class RollCostUI : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
-         
+
+
         foreach (var trait in EquipmentInstance.Traits)
         {
             if (!trait.IsLocked)
@@ -95,7 +96,16 @@ public class RollCostUI : MonoBehaviour
                 });
             }
         }
-         
+
+        int basePurpleCost = 5;
+        int numLockedTraits = EquipmentInstance.Traits.Count(t => t.IsLocked);
+
+        costs.Add(new GemsCost
+        {
+            Type = GemType.Purple,
+            Qte = numLockedTraits * basePurpleCost,
+        });
+
         foreach (var cost in costs)
         {
             GameObject go = new GameObject("GemImage");
