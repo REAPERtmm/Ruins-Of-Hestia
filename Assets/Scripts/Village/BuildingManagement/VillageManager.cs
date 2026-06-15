@@ -69,7 +69,15 @@ public class VillageManager : MonoBehaviour
 
     private void Update()
     {
-        UpdateView();
+        if (Keyboard.current.f3Key.wasPressedThisFrame)
+        {
+            foreach (var buildingScript in Grid.BuildingScripts)
+            {
+                buildingScript.PassDay();
+            }
+        }
+
+            UpdateView();
 
         UpdatePlacement();
     }

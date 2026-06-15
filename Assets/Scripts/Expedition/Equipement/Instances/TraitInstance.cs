@@ -9,7 +9,25 @@ public class TraitInstance
 
     public StatName Stat;
 
-    public float Value;
+    public GemsCost Cost;
 
-    public bool IsLocked;
+    public float Value; 
+
+    private bool _isLocked;
+
+    public bool IsLocked
+    {
+        get => _isLocked;
+        set
+        {
+            if (_isLocked == value)
+                return;
+
+            _isLocked = value;
+
+            OnLockChanged?.Invoke(this);
+        }
+    }
+
+    public event Action<TraitInstance> OnLockChanged;
 }

@@ -27,6 +27,7 @@ public class Tile
 public class Grid
 {
     public List<BuildingData> BuildingPlaced = new();
+    public List<BuildingScript> BuildingScripts = new();
 
     public int Width = 60;
     public int Height = 60;
@@ -124,6 +125,8 @@ public class Grid
         gameObject.transform.GetChild(0).gameObject.SetActive(false);
         script.Instantiate( buildingUiContainer );
         script.OnUnselected();
+        BuildingScripts.Add( script );
+
         return true;
     }
 

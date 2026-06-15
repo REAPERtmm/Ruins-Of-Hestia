@@ -30,8 +30,10 @@ public class Forge : BuildingScript
          EquipmentGenerator.RollTrait(ref equipment, TraitList);
     }
 
-    public void PassDay()
+    public override void PassDay() 
     {
+        Debug.Log("PassDay");
+
         for (int i = Jobs.Count - 1; i >= 0; i--)
         {
             Jobs[i].RemainingCraftingTime--;

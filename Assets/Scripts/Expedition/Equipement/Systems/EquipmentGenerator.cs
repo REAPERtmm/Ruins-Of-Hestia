@@ -161,6 +161,7 @@ public static class EquipmentGenerator
         return new TraitInstance()
         {
             Stat = rule.Stat,
+            Cost = rule.Cost,
             Type = type,
             Rarity = rarity,
             Value = value
