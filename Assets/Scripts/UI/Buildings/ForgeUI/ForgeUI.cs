@@ -23,16 +23,4 @@ public class ForgeUI : BuildingsUI
     {
         return CurrentForge;
     }
-
-    public void Update()
-    {
-        if (Keyboard.current.f3Key.wasPressedThisFrame)
-        {
-            if (CurrentForge != null)
-            {
-                CurrentForge.PassDay();
-                Debug.Log("PassDay");
-            }
-        }
-    }
 }

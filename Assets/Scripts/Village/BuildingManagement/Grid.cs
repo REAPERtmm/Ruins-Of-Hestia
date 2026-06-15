@@ -27,6 +27,7 @@ public class Tile
 public class Grid
 {
     public List<BuildingData> BuildingPlaced = new();
+    public List<BuildingScript> BuildingScripts = new();
 
     public int Width = 60;
     public int Height = 60;
@@ -117,6 +118,7 @@ public class Grid
             }
         }
         script.Instantiate( buildingUiContainer );
+        BuildingScripts.Add( script );
 
         return true;
     }
