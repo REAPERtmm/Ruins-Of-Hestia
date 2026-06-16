@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fbd84752a9272dc4d9d49adfc472b5c0, type: 3}
-  m_Name: Forge
-  m_EditorClassIdentifier: Assembly-CSharp::BuildingDescriptor
-  Name: Forge
-  Prefab: {fileID: 1074613482907823185, guid: 4461489a876ed184facd1226a7eda930, type: 3}
+  m_Name: Farm
+  m_EditorClassIdentifier: Assembly-CSharp::Building
+  Name: Farm
+  Prefab: {fileID: 1074613482907823185, guid: f10b183e0fb03034784e791ad23e6022, type: 3}
   Fondation:
     Width: 3
     Height: 3
   Visual:
-    Preview: {fileID: 21300000, guid: 0bd81b51e1c2c5f45a275f12393abdef, type: 3}
+    Preview: {fileID: 21300000, guid: 9f6b58ba9647203458de3f07e0fda1d8, type: 3}
   GlobalBuildingData:
     BuildingDuration: 0
     BaseBuildingCount: 0
