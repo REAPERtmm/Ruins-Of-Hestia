@@ -93,6 +93,22 @@ public class Grid
         return false;
     }
 
+    public bool CenterOfScreenToPoint(out Vector2 point)
+    {
+        Vector2 screenPos = new Vector2(Screen.width / 2f, Screen.height / 2f);
+        Ray ray = Camera.main.ScreenPointToRay(screenPos);
+
+        if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, _layerMask))
+        {
+            Vector3 worldPos = hit.point;
+            point = WorldToGrid(worldPos);
+
+            return true;
+        }
+        point = Vector2.zero;
+        return false;
+    }
+
     public bool IsOccupied(Vector2 position, BuildingFondation fondation)
     {
         bool occupied = false;
@@ -109,6 +125,8 @@ public class Grid
     {
         if ( IsOccupied(position, building.Fondation) )
             return false;
+
+        Inventory.Instance.Pay(building.GlobalBuildingData.PerLevelUpgradeCost);
 
         GameObject gameObject = Object.Instantiate(building.Prefab, GridToWorld(position), Quaternion.identity);
         BuildingScript script = gameObject.GetComponentInChildren<BuildingScript>();

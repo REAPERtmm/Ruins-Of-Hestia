@@ -24,4 +24,9 @@ MonoBehaviour:
   GlobalBuildingData:
     BuildingDuration: 4
     BaseBuildingCount: 0
-    PerLevelExtention: 
+    PerLevelBuildCountAdd: 
+    PerLevelUpgradeCost:
+    - Type: 0
+      Qte: 20
+    - Type: 1
+      Qte: 20

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 [Serializable]
@@ -24,7 +25,9 @@ public class GlobalBuildingData
     public int BuildingDuration;
 
     public int BaseBuildingCount;
-    public int[] PerLevelExtention;
+    public int[] PerLevelBuildCountAdd;
+
+    public List<ResourcesCost> PerLevelUpgradeCost = new List<ResourcesCost>();
 }
 
 [Serializable]

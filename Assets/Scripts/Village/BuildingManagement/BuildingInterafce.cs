@@ -3,16 +3,22 @@ using UnityEngine.Serialization;
 
 public abstract class BuildingScript : MonoBehaviour
 {
-    [SerializeField]
-    public GameObject BuildingUIPrefab;
+    [SerializeField] public GameObject BuildingUIPrefab;
 
     public BuildingData Data;
 
-    [SerializeField]
-    private BuildingView BuildingView;
+    [SerializeField] private BuildingView BuildingView;
 
-    [SerializeField]
-    private BuildingsUI BuildingUI;
+    [SerializeField] private BuildingsUI BuildingUI;
+
+    [Header("Build State")]
+    [SerializeField] private GameObject JustBuild;
+    [SerializeField] private GameObject Build;
+    [SerializeField] private GameObject InBuild;
+
+    [SerializeField] private AudioClip _upgradeSound;
+    [SerializeField] private AudioClip _onSelect;
+    [SerializeField] private AudioClip _onPlace;
 
     public BuildingsUI UI => BuildingUI;
 
@@ -20,12 +26,17 @@ public abstract class BuildingScript : MonoBehaviour
     {
         GameObject obj = Instantiate(BuildingUIPrefab, parent);
         BuildingUI = obj.GetComponent<BuildingsUI>();
+
+        SFXPlayer.PlaySFX(_onPlace);
+        InBuild.SetActive(true);
     }
 
     public virtual void OnClick()
     {
-        if (Data.DayLeftToBuild <= 0)
+        if (Data.DayLeftToBuild > 0)
             return;
+
+        SFXPlayer.PlaySFX(_onSelect);
 
         BuildingView.SetSelected( Data.Descriptor.Visual, true );
         BuildingUI.Open(this);
@@ -39,11 +50,19 @@ public abstract class BuildingScript : MonoBehaviour
 
     public virtual void PassDay()
     {
+        if (Data.DayLeftToBuild <= 0)
+            return;
+
         Data.DayLeftToBuild--;
         if (Data.DayLeftToBuild <= 0)
         {
-            gameObject.transform.GetChild(2).gameObject.SetActive(false);
-            gameObject.transform.GetChild(1).gameObject.SetActive(true);
+            BuildingView.View.gameObject.SetActive(true);
+
+            JustBuild.SetActive(true);
+            Build.SetActive(true);
+            InBuild.SetActive(false);
+
+            SFXPlayer.PlaySFX(_upgradeSound);
         }
     }
 }
