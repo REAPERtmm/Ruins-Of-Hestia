@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 [Serializable]
@@ -8,10 +7,17 @@ public class ResourceDescriptor
 {
     [SerializeField] public Vector2Int Room;
     [SerializeField] public Transform ResourceTransform;
+    [SerializeField] public ResourceController Controller;
 }
 
 public class ResourceManager : MonoBehaviour
 {
+    [Header("ResourcePrefabs")]
+    [SerializeField] GameObject WoodResource;
+    [SerializeField] GameObject StoneResource;
+    [SerializeField] GameObject MetalResource;
+    [SerializeField] GameObject FiberResource;
+
     bool IsInit = false;
     [SerializeField] List<ResourceDescriptor>[,] ResourceByRoom;
     [SerializeField] Vector2 RoomScale;
@@ -31,20 +37,48 @@ public class ResourceManager : MonoBehaviour
         IsInit = true;
     }
 
-    public void AppendResourceInRoom(Transform transform)
+    public Transform AppendResourceInRoom(Vector3 position, Transform where)
     {
-        if(transform == null) return;
+        ResourceType type = (ResourceType)UnityEngine.Random.Range(0, 4);
+
+        GameObject instance;
+        if (type == ResourceType.Stone)
+        {
+            instance = Instantiate(StoneResource, where);
+        }
+        else if(type == ResourceType.Leaves)
+        {
+            instance = Instantiate(FiberResource, where);
+        }
+        else if (type == ResourceType.Wood)
+        {
+            instance = Instantiate(WoodResource, where);
+        }
+        else if (type == ResourceType.Metal)
+        {
+            instance = Instantiate(MetalResource, where);
+        }
+        else
+        {
+            Debug.LogWarning("Unsupported ResourceType");
+            return null;
+        }
+        instance.transform.position = position;
 
         Vector2Int room = new Vector2Int(
-            (int)(transform.position.x / RoomScale.x), 
-            (int)(transform.position.z / RoomScale.y)
-            );
+            (int)(position.x / RoomScale.x),
+            (int)(position.z / RoomScale.y)
+        );
 
         ResourceDescriptor resourceDescriptor = new ResourceDescriptor();
         resourceDescriptor.Room = room;
-        resourceDescriptor.ResourceTransform = transform;
+        resourceDescriptor.ResourceTransform = instance.transform;
+        resourceDescriptor.Controller = instance.transform.GetComponent<ResourceController>();
 
         ResourceByRoom[room.x, room.y].Add(resourceDescriptor);
+
+
+        return instance.transform;
     }
 
     public ResourceDescriptor GetClosestResource(Vector3 position)
@@ -56,8 +90,6 @@ public class ResourceManager : MonoBehaviour
         }
 
         Vector2Int room = new Vector2Int((int)(position.x / RoomScale.x), (int)(position.z / RoomScale.y));
-
-        Debug.Log("current room : " + room);
 
         float distance_sq_min = float.MaxValue;
         ResourceDescriptor closest = null;

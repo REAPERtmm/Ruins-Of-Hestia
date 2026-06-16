@@ -45,7 +45,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 192
@@ -73,7 +73,6 @@ MonoBehaviour:
   Animation: {fileID: 5683612092729184756}
   Model: {fileID: 1729403977923103630}
   Collider: {fileID: 6646223014098036149}
-  CharController: {fileID: 0}
   Combat: {fileID: 2358279281082916239}
   Targets: []
   RoamingMovementSpeed: 10

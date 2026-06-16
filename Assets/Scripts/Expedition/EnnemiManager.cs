@@ -11,6 +11,8 @@ public class Ennemi
 
 public class EnnemiManager : MonoBehaviour
 {
+    static EnnemiManager INSTANCE;
+
     [Header("Debug")]
     [SerializeField] List<Ennemi> EnnemisRegistered;
     [SerializeField] Ennemi[] AllEnnemis;
@@ -24,6 +26,14 @@ public class EnnemiManager : MonoBehaviour
     bool IsInit = false;
 
     public int ENNEMIES_REGISTERED => EnnemisRegistered.Count;
+
+    private void Awake()
+    {
+        if(INSTANCE == null)
+        {
+            INSTANCE = this;
+        }
+    }
 
     public void InitWithRoom(Vector2Int room_count, Vector2 room_scale)
     {
@@ -112,8 +122,6 @@ public class EnnemiManager : MonoBehaviour
 
         Vector2Int room = new Vector2Int((int)(position.x / RoomScale.y), (int)(position.z / RoomScale.y));
 
-        Debug.Log("current room : " + room);
-
         float distance_sq_min = float.MaxValue;
         Ennemi closest = null;
         foreach (Ennemi ennemi in EnumAllActiveEnnemies(room.x, room.y))
@@ -130,5 +138,7 @@ public class EnnemiManager : MonoBehaviour
 
         return closest;
     }
+
+
 
 }

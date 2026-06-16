@@ -92,6 +92,7 @@ public class Inventory : MonoBehaviour
 
         stack.Amount += amount;
     }
+
     public void AddResource(GemType type, int amount)
     {
         GemStack stack = gems.Find(x => x.Type == type);

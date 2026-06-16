@@ -15,11 +15,13 @@ public class HitBoxCallBack : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        Debug.Log("Collided with " + other.name);
         CombatController otherCombat = other.GetComponent<CombatController>();
         if (otherCombat == null)
         {
             return;
         }
+
 
         if (Hitted.Contains(other.transform) == false && otherCombat.GROUP != hitBoxAttack.GetCaster().GROUP)
         {

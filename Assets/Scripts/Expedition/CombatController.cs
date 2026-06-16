@@ -242,6 +242,70 @@ public class CombatController : MonoBehaviour
         }
     }
 
+    public float DISTANCE_DAMAGE
+    {
+        get
+        {
+            if (DistanceWeapon != null) return EquipmentStatCalculator.GetStat(DistanceWeapon, StatName.Damage);
+            return 0;
+        }
+    }
+
+    public float DISTANCE_CRITICAL_CHANCE
+    {
+        get
+        {
+
+            if (DistanceWeapon != null) return EquipmentStatCalculator.GetStat(DistanceWeapon, StatName.CriticalChance);
+            return 0;
+        }
+    }
+
+    public float DISTANCE_CRITICAL_MULTIPLIER
+    {
+        get
+        {
+            if (DistanceWeapon != null) return EquipmentStatCalculator.GetStat(DistanceWeapon, StatName.CriticalMultiplier);
+            return 0;
+        }
+    }
+
+    public float DISTANCE_ATTACK_SPEED
+    {
+        get
+        {
+            if (DistanceWeapon != null) return EquipmentStatCalculator.GetStat(DistanceWeapon, StatName.AttackSpeed);
+            return 0;
+        }
+    }
+
+    public float DISTANCE_PENETRATION
+    {
+        get
+        {
+            if (DistanceWeapon != null) return EquipmentStatCalculator.GetStat(DistanceWeapon, StatName.Penetration);
+            return 0;
+        }
+    }
+
+    public float DISTANCE_PROJECTILE_SIZE
+    {
+        get
+        {
+            if (DistanceWeapon != null) return EquipmentStatCalculator.GetStat(DistanceWeapon, StatName.ProjectileSize);
+            return 0;
+        }
+    }
+
+    public float DISTANCE_PROJECTILE_SPEED
+    {
+        get
+        {
+            if (DistanceWeapon != null) return EquipmentStatCalculator.GetStat(DistanceWeapon, StatName.ProjectileSpeed);
+            return 0;
+        }
+    }
+
     public void RegisterTarget(Transform target) => Targets.Add(target);
 
     private void Start()
@@ -304,18 +368,49 @@ public class CombatController : MonoBehaviour
     // Return wether it could attack or not
     public bool AttackClosest()
     {
-        if (IsAttacking || ClosestTarget == null) {
+        if (IsAttacking) {
             return false;
         }
+        UpdateClosest();
+        if (ClosestTarget == null)
+            return false;
 
         Vector3 direction = ClosestTarget.position - transform.position;
         AttackPlayed = StartCoroutine(DefaultMeleeAttackAnimation(direction.normalized, 0.1f, 0.5f));
         return true;
     }
 
-    public void FixedUpdate() { 
-        UpdateClosest();
+    public bool AttackTarget(Transform target)
+    {
+        if (IsAttacking)
+        {
+            return false;
+        }
 
-        if (MeleeAttack == null) return;
+        Vector3 direction = target.position - transform.position;
+        AttackPlayed = StartCoroutine(DefaultMeleeAttackAnimation(direction.normalized, 0.1f, 0.5f));
+        return true;
+    }
+
+    public void TakeDamage(CombatController other, bool is_melee)
+    {
+        if(is_melee)
+        {
+            CurrentHP -= other.MELEE_DAMAGE;
+        }
+        else
+        {
+            CurrentHP -= other.DISTANCE_DAMAGE;
+        }
+
+    }
+
+    public void Die()
+    {
+        if (GROUP == EntityGroup.Ennemi)
+        {
+            Ennemi ennemi = GetComponent<Ennemi>();
+
+        }
     }
 }
