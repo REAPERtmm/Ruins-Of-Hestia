@@ -21,7 +21,7 @@ public class Farm : BuildingScript
 
     public override void PassDay() 
     {
-        
+        base.PassDay();
 
         for (int i = Jobs.Count - 1; i >= 0; i--)
         {

@@ -13,13 +13,16 @@ MonoBehaviour:
   m_Name: Farm
   m_EditorClassIdentifier: Assembly-CSharp::Building
   Name: Farm
-  Prefab: {fileID: 1074613482907823185, guid: f10b183e0fb03034784e791ad23e6022, type: 3}
+  Prefab: {fileID: 3053426240108742123, guid: 08c86001a48eae54fb4943cebd58d773, type: 3}
   Fondation:
     Width: 3
     Height: 3
   Visual:
     Preview: {fileID: 21300000, guid: 9f6b58ba9647203458de3f07e0fda1d8, type: 3}
+    Active: {fileID: 2100000, guid: 1dabe9416fe836643b8f9e3198906dd8, type: 2}
+    Default: {fileID: 2100000, guid: 1b7c9c354eff8ef438f64d591c0d9ac2, type: 2}
   GlobalBuildingData:
-    BuildingDuration: 0
-    BaseBuildingCount: 0
-    PerLevelExtention: 
+    BuildingDuration: 2
+    BaseBuildingCount: 1
+    PerLevelBuildCountAdd: 
+    PerLevelUpgradeCost: []
