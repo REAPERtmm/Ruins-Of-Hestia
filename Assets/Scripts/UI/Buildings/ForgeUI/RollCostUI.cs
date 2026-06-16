@@ -98,7 +98,7 @@ public class RollCostUI : MonoBehaviour
         }
 
         int basePurpleCost = 5;
-        int numLockedTraits = EquipmentInstance.Traits.Count(t => t.IsLocked);
+        int numLockedTraits = EquipmentInstance.Traits.Count(t => t.IsLocked) + 1;
 
         costs.Add(new GemsCost
         {
