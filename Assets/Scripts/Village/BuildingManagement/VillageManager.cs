@@ -104,6 +104,7 @@ public class VillageManager : MonoBehaviour
                 {
                     SelectedBuilding = tile.BuildingScript;
                     tile.BuildingScript.OnClick();
+                    UiManager.ViewModeGroup.SetActive(false);
                 }
                 else
                 {
@@ -111,6 +112,7 @@ public class VillageManager : MonoBehaviour
                     {
                         SelectedBuilding.OnUnselected();
                         SelectedBuilding = null;
+                        UiManager.ViewModeGroup.SetActive(true);
                     }
                 }
             }
