@@ -1,5 +1,6 @@
 using DG.Tweening;
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -29,11 +30,11 @@ public class PlayerController : MonoBehaviour
     Inventory inventory;
 
     [SerializeField] ResourceDescriptor closestResource = null;
-    [SerializeField] Sequence closestResourceSequence = null;
+    [SerializeField] DG.Tweening.Sequence closestResourceSequence = null;
     [SerializeField] float closestResourceDistance = float.MaxValue;
 
     [SerializeField] Ennemi closestEnnemi = null;
-    [SerializeField] Sequence closestEnnemiSequence = null;
+    [SerializeField] DG.Tweening.Sequence closestEnnemiSequence = null;
     [SerializeField] float closestEnnemiDistance = float.MaxValue;
     [SerializeField] Coroutine attackCoroutine = null;
 
@@ -120,7 +121,7 @@ public class PlayerController : MonoBehaviour
         }
 
         Ennemi closest = ManagerEnnemis.GetClosestEnnemi(transform.position);
-        if (closest == null)
+        if (closest == null || closest.Controller == null || closest.Controller.IsDestroyed())
         {
             Debug.Log("No ennemi found");
             return;
@@ -160,6 +161,11 @@ public class PlayerController : MonoBehaviour
     IEnumerator StartAttackEnnemiCoroutine(Ennemi ennemi)
     {
         while (true) {
+            if (ennemi.Controller.IsDestroyed())
+            {
+                attackCoroutine = null;
+                break;
+            }
             closestEnnemiDistance = Vector3.Distance(ennemi.Combat.transform.position, transform.position);
 
             if (closestEnnemiDistance < closestResourceDistance && closestEnnemiDistance < Combat.MELEE_RANGE)

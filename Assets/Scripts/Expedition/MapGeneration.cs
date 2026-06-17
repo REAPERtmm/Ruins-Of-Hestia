@@ -404,6 +404,9 @@ public class MapGeneration : MonoBehaviour
     public float GenerationSizeX { get => RoomCount.x * RoomScale.x; }
     public float GenerationSizeY { get => RoomCount.y * RoomScale.y; }
 
+    public EnnemiManager ennemi_manager => ManagerEnnemis;
+    public ResourceManager resource_manager => ManagerResources;
+
     RoomObject CreateRoom(Room room, int x_room, int y_room)
     {
         RoomObject roomObject = new RoomObject();
@@ -532,7 +535,7 @@ public class MapGeneration : MonoBehaviour
 
         float ScaleY = (Factory.RoomScale.x + Factory.RoomScale.y) * 0.5f;
 
-        WaterObject.transform.position = new Vector3(-OverflowX * 0.5f, -0.1f * ScaleY, -OverflowY * 0.5f);
+        WaterObject.transform.position = new Vector3(-OverflowX * 0.5f, -0.05f * ScaleY, -OverflowY * 0.5f);
         WaterObject.transform.localScale = new Vector3(OverScaling, 1.0f, OverScaling);
 
         // Room Objects :

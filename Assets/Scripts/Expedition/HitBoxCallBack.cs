@@ -15,7 +15,6 @@ public class HitBoxCallBack : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("Collided with " + other.name);
         CombatController otherCombat = other.GetComponent<CombatController>();
         if (otherCombat == null)
         {
@@ -36,4 +35,5 @@ public class HitBoxCallBack : MonoBehaviour
             }
         }
     }
+
 }

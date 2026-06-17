@@ -394,13 +394,19 @@ public class CombatController : MonoBehaviour
 
     public void TakeDamage(CombatController other, bool is_melee)
     {
+
         if(is_melee)
         {
             CurrentHP -= other.MELEE_DAMAGE;
+            Debug.Log(name + " took " + other.MELEE_DAMAGE + " dmg. Now has " + CurrentHP + " hp");
         }
         else
         {
             CurrentHP -= other.DISTANCE_DAMAGE;
+            Debug.Log(name + " took " + other.DISTANCE_DAMAGE + " dmg. Now has " + CurrentHP + " hp");
+        }
+        if (CurrentHP < 0) {
+            Die();
         }
 
     }
@@ -409,8 +415,8 @@ public class CombatController : MonoBehaviour
     {
         if (GROUP == EntityGroup.Ennemi)
         {
-            Ennemi ennemi = GetComponent<Ennemi>();
-
+            EnnemiController ennemi = GetComponent<EnnemiController>();
+            MapGeneration.INSTANCE.ennemi_manager.KillEnnemi(ennemi);
         }
     }
 }

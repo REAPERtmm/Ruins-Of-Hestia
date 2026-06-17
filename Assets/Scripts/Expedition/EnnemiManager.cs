@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [Serializable]
@@ -76,11 +77,17 @@ public class EnnemiManager : MonoBehaviour
         EnnemisByRoom = null;
     }
 
-    public void KillEnnemi(Ennemi ennemi)
+    public void KillEnnemi(EnnemiController ennemi)
     {
+        if (ennemi == null || ennemi.gameObject.IsDestroyed())
+        {
+            Debug.LogWarning("trying to kill a null ennemi");
+            return;
+        }
+
         for (int i = 0; i < EnnemisTotalCount; i++)
         {
-            if (AllEnnemis[i] == ennemi)
+            if (AllEnnemis[i].Controller == ennemi)
             {
                 AllEnnemis[i] = AllEnnemis[EnnemisTotalCount - 1];
                 EnnemisTotalCount--;
@@ -88,7 +95,8 @@ public class EnnemiManager : MonoBehaviour
             }
         }
 
-        EnnemisByRoom[ennemi.Controller.InitRoom.x, ennemi.Controller.InitRoom.y].Remove(ennemi);
+        EnnemisByRoom[ennemi.InitRoom.x, ennemi.InitRoom.y].RemoveAll(ctx => ctx.Controller == ennemi);
+        Destroy(ennemi.gameObject);
     }
 
     public IEnumerable<Ennemi> EnumAllEnnemies()
