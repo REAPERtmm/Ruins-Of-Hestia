@@ -16,7 +16,7 @@ public class Farm : BuildingScript
             Recipe = recipe, RemainingCraftingTime = recipe.CraftingTime 
         });
 
-        return true;    
+        return true;
     }
 
     public override void PassDay() 
@@ -34,5 +34,23 @@ public class Farm : BuildingScript
                 Jobs.RemoveAt(i);
             }
         }
-    } 
+    }
+
+    public override BuildingProduction[] GetCurrentProduction()
+    {
+        List<BuildingProduction> productions = new();
+        for (var i = 0; i < Jobs.Count; i++)
+        {
+            var craftJob = Jobs[i];
+            productions.Add( new BuildingProduction()
+            {
+                Building = ProducingBuilding.Forge,
+                Name = craftJob.Recipe.RecipeName,
+                DayLeft = craftJob.RemainingCraftingTime,
+                Icon = craftJob.Recipe.Icon
+            });
+        }
+
+        return productions.ToArray();
+    }
 }

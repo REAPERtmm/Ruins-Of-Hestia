@@ -46,5 +46,24 @@ public class Forge : BuildingScript
                 Jobs.RemoveAt(i);
             }
         }
-    } 
+    }
+
+    public override BuildingProduction[] GetCurrentProduction()
+    {
+        List<BuildingProduction> productions = new();
+        for (var i = 0; i < Jobs.Count; i++)
+        {
+            var craftJob = Jobs[i];
+            productions.Add( new BuildingProduction()
+            {
+                Building = ProducingBuilding.Forge,
+                Name = craftJob.Recipe.Result.EquipmentName,
+                DayLeft = craftJob.RemainingCraftingTime,
+                Icon = craftJob.Recipe.Result.Icon
+            });
+        }
+
+        return productions.ToArray();
+    }
+
 }

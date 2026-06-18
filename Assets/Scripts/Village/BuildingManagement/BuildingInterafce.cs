@@ -1,6 +1,22 @@
 using UnityEngine;
 using UnityEngine.Serialization;
 
+public enum ProducingBuilding
+{
+    Forge,
+    Farm
+}
+
+public class BuildingProduction
+{
+
+    public ProducingBuilding Building;
+    public int      DayLeft;
+    public string   Name;
+    public int      Quantity;
+    public Sprite   Icon;
+}
+
 public abstract class BuildingScript : MonoBehaviour
 {
     [SerializeField] public GameObject BuildingUIPrefab;
@@ -65,4 +81,6 @@ public abstract class BuildingScript : MonoBehaviour
             SFXPlayer.PlaySFX(_upgradeSound);
         }
     }
+
+    public abstract BuildingProduction[] GetCurrentProduction();
 }
