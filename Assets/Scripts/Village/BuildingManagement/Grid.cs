@@ -154,6 +154,9 @@ public class Grid
 
     public Tile GetTile(Vector2 position)
     {
+        if (position.x < 0 || position.x >= Width || position.y < 0 || position.y >= Height)
+            return null;
+
         return _tiles[(int)position.x, (int)position.y];
     }
 

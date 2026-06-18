@@ -4,6 +4,7 @@ using DG.Tweening;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 
 public enum VillageMode
@@ -32,6 +33,7 @@ public class VillageManager : MonoBehaviour
     public UiManager        UiManager;
     public PlacementModeUi  UiPlacement;
     public ResourceUI       UiResource;
+    public GameObject       UiBillboard;
 
     [Header("Debug")]
     public GameObject   DebugCube;
@@ -99,6 +101,9 @@ public class VillageManager : MonoBehaviour
                     return;
 
                 Tile tile = Grid.GetTile(gridPos);
+
+                if (tile == null)
+                    return;
 
                 if (tile.BuildingScript != null)
                 {
@@ -226,11 +231,26 @@ public class VillageManager : MonoBehaviour
 
     public void PassDay()
     {
-
         foreach (var buildingScript in Grid.BuildingScripts)
         {
             buildingScript.PassDay();
         }
+    }
+
+    public void OpenBillboard()
+    {
+        UiBillboard.SetActive(true);
+    }
+
+    public void CloseBillboard()
+    {
+        ToViewMode();
+        UiBillboard.SetActive(false);
+    }
+
+    public void ToExpeditionMap()
+    {
+        SceneManager.LoadScene(2);
     }
 
     private void PlacePreviewAt( Vector2 gridPos )
