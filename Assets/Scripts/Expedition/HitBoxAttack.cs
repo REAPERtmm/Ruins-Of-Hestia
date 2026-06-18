@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Playables;
 
@@ -47,6 +48,10 @@ public class HitBoxAttack : MonoBehaviour
         }
 
         LastPosition = transform.position;
+        if(HitInstance.SourceController == null || HitInstance.SourceController.IsDestroyed())
+        {
+            Destroy(gameObject);
+        }
     }
 
     public void ProccessCollision(CombatController other)

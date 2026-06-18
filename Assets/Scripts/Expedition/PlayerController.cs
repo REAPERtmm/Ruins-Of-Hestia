@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] Image PlayerMiniMapUI;
     [SerializeField] Animator CaliAnimator;
     [SerializeField] public CombatController Combat;
+    [SerializeField] TargetMarker TargetMarkerObject;
     [SerializeField] EnnemiManager ManagerEnnemis;
     [SerializeField] ResourceManager ManagerResources;
     MapGeneration MapGenerationManager;
@@ -34,9 +35,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float closestResourceDistance = float.MaxValue;
 
     [SerializeField] Ennemi closestEnnemi = null;
-    [SerializeField] DG.Tweening.Sequence closestEnnemiSequence = null;
     [SerializeField] float closestEnnemiDistance = float.MaxValue;
-    [SerializeField] Coroutine attackCoroutine = null;
+    [SerializeField] float last_attack_time = float.MinValue;
 
     public Vector2 NormalizedPlayerPositionInMap
     {
@@ -85,30 +85,38 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        closestResourceDistance = Vector3.Distance(closest.ResourceTransform.position, transform.position);
-        if (closest != closestResource) {
+        float distance = Vector3.Distance(closest.ResourceTransform.position, transform.position);
 
-            if (closestResource != null && closestResource.ResourceTransform != null)
+        if(distance < Combat.MELEE_RANGE * 2.0f)
+        {
+            if (closest != closestResource)
             {
-                // Debug.Log("Changed closest from : " + closestResource.ResourceTransform + " / to : " + closest.ResourceTransform);
                 closestResourceSequence?.Kill();
-                closestResource.ResourceTransform.localScale = Vector3.one;
+
+                closestResourceSequence = DOTween.Sequence();
+                closestResourceSequence.Append(closest.ResourceTransform.DOScale(new Vector3(0.95f, 1.05f, 1.0f), 0.15f));
+                closestResourceSequence.SetLoops(int.MaxValue, LoopType.Yoyo);
+
+                // TODO : add to shared inventory
+                closestResourceSequence.onStepComplete = () => {
+                    if (distance < closestEnnemiDistance)
+                    {
+                        inventory.AddResource(closest.Controller.resourceType, 1);
+                    }
+                };
+
+                closestResource = closest;
             }
-            closestResourceSequence = DOTween.Sequence();
-            closestResourceSequence.Append(closest.ResourceTransform.DOScale(new Vector3(0.95f, 1.05f, 1.0f), 0.15f));
-            closestResourceSequence.SetLoops(int.MaxValue, LoopType.Yoyo);
-
-            closestResource = closest;
-
-            // TODO : add to shared inventory
-            closestResourceSequence.onStepComplete = () => { 
-                if(closestResourceDistance < closestEnnemiDistance) { 
-                    inventory.AddResource(closestResource.Controller.resourceType, 1); 
-                }
-            };
-            closestResourceSequence.Restart();
 
         }
+        else
+        {
+            closestResourceSequence?.Kill();
+            closestResourceSequence = null;
+            closestResource = null;
+        }
+
+        closestResourceDistance = distance;
 
     }
 
@@ -123,59 +131,37 @@ public class PlayerController : MonoBehaviour
         Ennemi closest = ManagerEnnemis.GetClosestEnnemi(transform.position);
         if (closest == null || closest.Controller == null || closest.Controller.IsDestroyed())
         {
+            TargetMarkerObject.gameObject.SetActive(false);
             Debug.Log("No ennemi found");
             return;
         }
 
+        closestEnnemi = closest;
+       
 
-        if (closest != closestEnnemi)
+        if (closestEnnemi != null && closestEnnemi.Combat.IsDestroyed() == false)
         {
-
-            if (closestEnnemi != null && closestEnnemi.Controller != null)
+            float distance = Vector3.Distance(transform.position, closestEnnemi.Combat.transform.position);
+            
+            if(distance < Combat.MELEE_RANGE * 1.5f)
             {
-                // Debug.Log("Changed closest from : " + closestResource.ResourceTransform + " / to : " + closest.ResourceTransform);
-                closestEnnemiSequence?.Kill();
-                closestEnnemi.Controller.transform.localScale = Vector3.one;
+                if (TargetMarkerObject.TARGET != closestEnnemi.Combat.transform)
+                {
+                    TargetMarkerObject.FollowTarget(closest.Controller.transform, 2.0f);
+                    TargetMarkerObject.gameObject.SetActive(true);
+                }
+
+                if(Time.time - last_attack_time > 1.0 / Combat.MELEE_ATTACK_SPEED)
+                {
+                    if(Combat.TryAttackTarget(closestEnnemi.Combat.transform))
+                        last_attack_time = Time.time;
+                }
             }
 
-            if (attackCoroutine != null)
-            {
-                StopCoroutine(attackCoroutine);
-                closestEnnemiDistance = float.MaxValue;
-                attackCoroutine = null;
-            }
-
-            closestEnnemiSequence = DOTween.Sequence();
-            closestEnnemiSequence.Append(closest.Controller.transform.DOScale(Vector3.one * 1.5f, 0.5f / Combat.MELEE_ATTACK_SPEED));
-            closestEnnemiSequence.SetLoops(int.MaxValue, LoopType.Yoyo);
-
-            closestEnnemi = closest;
-
-            attackCoroutine = StartCoroutine(StartAttackEnnemiCoroutine(closestEnnemi));
-
-            closestEnnemiSequence.Restart();
         }
 
     }
 
-    IEnumerator StartAttackEnnemiCoroutine(Ennemi ennemi)
-    {
-        while (true) {
-            if (ennemi.Controller.IsDestroyed())
-            {
-                attackCoroutine = null;
-                break;
-            }
-            closestEnnemiDistance = Vector3.Distance(ennemi.Combat.transform.position, transform.position);
-
-            if (closestEnnemiDistance < closestResourceDistance && closestEnnemiDistance < Combat.MELEE_RANGE)
-            {
-                Combat.AttackTarget(closestEnnemi.Controller.transform);
-            }
-
-            yield return new WaitForSeconds(1 / Combat.MELEE_ATTACK_SPEED);
-        }
-    }
 
     void UpdateMiniMapPlayerUI()
     {

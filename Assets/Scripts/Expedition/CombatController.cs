@@ -366,7 +366,7 @@ public class CombatController : MonoBehaviour
     public bool IsAttacking => AttackPlayed != null;
 
     // Return wether it could attack or not
-    public bool AttackClosest()
+    public bool AttackClosest(float delay = 0.5f)
     {
         if (IsAttacking) {
             return false;
@@ -376,11 +376,11 @@ public class CombatController : MonoBehaviour
             return false;
 
         Vector3 direction = ClosestTarget.position - transform.position;
-        AttackPlayed = StartCoroutine(DefaultMeleeAttackAnimation(direction.normalized, 0.1f, 0.5f));
+        AttackPlayed = StartCoroutine(DefaultMeleeAttackAnimation(direction.normalized, 0.1f, delay));
         return true;
     }
 
-    public bool AttackTarget(Transform target)
+    public bool TryAttackTarget(Transform target, float delay = 0.0f)
     {
         if (IsAttacking)
         {
@@ -388,7 +388,7 @@ public class CombatController : MonoBehaviour
         }
 
         Vector3 direction = target.position - transform.position;
-        AttackPlayed = StartCoroutine(DefaultMeleeAttackAnimation(direction.normalized, 0.1f, 0.5f));
+        AttackPlayed = StartCoroutine(DefaultMeleeAttackAnimation(direction.normalized, 0.1f, delay));
         return true;
     }
 
@@ -405,7 +405,7 @@ public class CombatController : MonoBehaviour
             CurrentHP -= other.DISTANCE_DAMAGE;
             Debug.Log(name + " took " + other.DISTANCE_DAMAGE + " dmg. Now has " + CurrentHP + " hp");
         }
-        if (CurrentHP < 0) {
+        if (CurrentHP <= 0) {
             Die();
         }
 
