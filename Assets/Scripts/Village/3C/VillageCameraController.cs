@@ -1,3 +1,4 @@
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -21,6 +22,14 @@ public class VillageCameraController : MonoBehaviour
 
     Vector3 ROTATEDY;
     Vector3 ROTATEDX;
+
+    [Header("Focus")]
+    public Vector2 Offset;
+    public float MinDuration = 0.3f;
+    public float MaxDuration = 1.5f;
+    public float SpeedReference = 20f;
+    public Ease MoveEase = Ease.InOutCubic;
+    private Tweener _tween;
 
     private void OnEnable()
     {
@@ -54,7 +63,7 @@ public class VillageCameraController : MonoBehaviour
 
         myCamera.orthographicSize = CameraSize;
 
-        if (IsDraging) {
+        if (IsDraging) { 
             Target.transform.position  += (ROTATEDX * MouseDelta.x + ROTATEDY * MouseDelta.y) * (TargetSpeed * Time.deltaTime);
             Vector3 tragetPos = Target.transform.position;
             if (tragetPos.x < 0)
@@ -76,6 +85,22 @@ public class VillageCameraController : MonoBehaviour
             }
             Target.transform.position = tragetPos;
         }
+    }
+
+    public void FocusOn(Vector3 worldPosition)
+    {
+        Vector3 destination = new Vector3(worldPosition.x + Offset.x, Target.transform.position.y, worldPosition.z + Offset.y);
+        float distance = Vector3.Distance(Target.transform.position, destination);
+        float duration = Mathf.Clamp(distance / SpeedReference, MinDuration, MaxDuration);
+
+
+        _tween?.Kill();
+        _tween = Target.transform.DOMove(destination, duration).SetEase(MoveEase);
+    }
+
+    public void CancelFocus()
+    {
+        _tween?.Kill();
     }
 
 }
