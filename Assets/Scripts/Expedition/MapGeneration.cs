@@ -404,6 +404,9 @@ public class MapGeneration : MonoBehaviour
     public float GenerationSizeX { get => RoomCount.x * RoomScale.x; }
     public float GenerationSizeY { get => RoomCount.y * RoomScale.y; }
 
+    public EnnemiManager ennemi_manager => ManagerEnnemis;
+    public ResourceManager resource_manager => ManagerResources;
+
     RoomObject CreateRoom(Room room, int x_room, int y_room)
     {
         RoomObject roomObject = new RoomObject();
@@ -440,17 +443,13 @@ public class MapGeneration : MonoBehaviour
     }
 
     Transform CreateResource(Vector3 position, in RoomObject obj)
-    {
-        GameObject instance = Instantiate(ResourcePrefab, obj.Resources);
-
+    { 
         float random_offset_x = Random.Range(-Factory.TileGroupScale.x, Factory.TileGroupScale.x) * 0.35f;
         float random_offset_y = Random.Range(-Factory.TileGroupScale.y, Factory.TileGroupScale.y) * 0.35f;
         Vector3 random_offset = new Vector3(random_offset_x, 0, random_offset_y);
 
-        instance.transform.position = position + random_offset;
-
-        ManagerResources.AppendResourceInRoom(instance.transform);
-        return instance.transform;
+        Transform resource = ManagerResources.AppendResourceInRoom(position + random_offset, obj.Resources);
+        return resource.transform;
     }
 
     Transform CreateEnnemi(Vector3 position, in RoomObject obj)
@@ -536,7 +535,7 @@ public class MapGeneration : MonoBehaviour
 
         float ScaleY = (Factory.RoomScale.x + Factory.RoomScale.y) * 0.5f;
 
-        WaterObject.transform.position = new Vector3(-OverflowX * 0.5f, -0.1f * ScaleY, -OverflowY * 0.5f);
+        WaterObject.transform.position = new Vector3(-OverflowX * 0.5f, -0.05f * ScaleY, -OverflowY * 0.5f);
         WaterObject.transform.localScale = new Vector3(OverScaling, 1.0f, OverScaling);
 
         // Room Objects :
@@ -630,21 +629,19 @@ public class MapGeneration : MonoBehaviour
         }
     }
 
-    public void OnEnable()
-    {
-        INSTANCE = this;
-    }
-
-    private void OnDisable()
-    {
-        INSTANCE = null;
-    }
-
     public void Update()
     {
         int player_x = (int)(Player.transform.position.x / RoomScale.x);
         int player_y = (int)(Player.transform.position.z / RoomScale.y);
         RoomCulling(player_x, player_y);
+    }
+
+    private void Awake()
+    {
+        if (INSTANCE == null)
+        {
+            INSTANCE = this;
+        }
     }
 
     private void Start()

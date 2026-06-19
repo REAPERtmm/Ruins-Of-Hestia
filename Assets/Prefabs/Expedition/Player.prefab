@@ -46,7 +46,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 192
@@ -100,8 +100,18 @@ MonoBehaviour:
   CaliAnimator: {fileID: 3482686469855565781}
   Combat: {fileID: 8127787276281221390}
   ManagerEnnemis: {fileID: 0}
+  ManagerResources: {fileID: 0}
   Speed: 12
   Acceleration: 5
+  closestResource:
+    Room: {x: 0, y: 0}
+    ResourceTransform: {fileID: 0}
+    Controller: {fileID: 0}
+  closestResourceDistance: 3.4028235e+38
+  closestEnnemi:
+    Combat: {fileID: 0}
+    Controller: {fileID: 0}
+  closestEnnemiDistance: 3.4028235e+38
 --- !u!114 &8127787276281221390
 MonoBehaviour:
   m_ObjectHideFlags: 0

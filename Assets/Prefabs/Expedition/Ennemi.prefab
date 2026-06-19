@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6646223014098036149}
   - component: {fileID: 8182973945339299411}
   - component: {fileID: 2358279281082916239}
+  - component: {fileID: 1764199687691018956}
   m_Layer: 7
   m_Name: Ennemi
   m_TagString: Untagged
@@ -45,7 +46,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 192
@@ -73,11 +74,10 @@ MonoBehaviour:
   Animation: {fileID: 5683612092729184756}
   Model: {fileID: 1729403977923103630}
   Collider: {fileID: 6646223014098036149}
-  CharController: {fileID: 0}
   Combat: {fileID: 2358279281082916239}
   Targets: []
-  RoamingMovementSpeed: 10
-  FocusMovementSpeed: 15
+  RoamingMovementSpeed: 7.5
+  FocusMovementSpeed: 10
   RoamingMaxDuration: 2.5
   IdleMaxDuration: 1
   RoamingMinDuration: 0.75
@@ -86,6 +86,8 @@ MonoBehaviour:
   DetectionRadiusRoaming: 7
   FocusMinDistance: 12
   InitRoom: {x: 0, y: 0}
+  CurrentState: 0
+  Target: {fileID: 0}
 --- !u!114 &2358279281082916239
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -135,6 +137,33 @@ MonoBehaviour:
   BaseSpeed: 1
   BaseLuck: 0
   BaseProvocation: 0
+--- !u!54 &1764199687691018956
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3086522762322397844}
+  serializedVersion: 5
+  m_Mass: 0.0000001
+  m_LinearDamping: 0
+  m_AngularDamping: 0
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 80
+  m_CollisionDetection: 0
 --- !u!1001 &2272816687197482085
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -1,3 +1,6 @@
+using DG.Tweening;
+using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -10,6 +13,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] Image PlayerMiniMapUI;
     [SerializeField] Animator CaliAnimator;
     [SerializeField] public CombatController Combat;
+    [SerializeField] TargetMarker TargetMarkerObject;
     [SerializeField] EnnemiManager ManagerEnnemis;
     [SerializeField] ResourceManager ManagerResources;
     MapGeneration MapGenerationManager;
@@ -24,8 +28,15 @@ public class PlayerController : MonoBehaviour
     CharacterController characterController;
     InputAction ControlMove;
 
+    Inventory inventory;
+
     [SerializeField] ResourceDescriptor closestResource = null;
+    [SerializeField] DG.Tweening.Sequence closestResourceSequence = null;
+    [SerializeField] float closestResourceDistance = float.MaxValue;
+
     [SerializeField] Ennemi closestEnnemi = null;
+    [SerializeField] float closestEnnemiDistance = float.MaxValue;
+    [SerializeField] float last_attack_time = float.MinValue;
 
     public Vector2 NormalizedPlayerPositionInMap
     {
@@ -56,6 +67,7 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         MapGenerationManager = transform.parent.GetComponent<MapGeneration>();
+        inventory = GetComponent<Inventory>();
     }
 
     void UpdateResourceTarget()
@@ -73,16 +85,38 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        if (closest != closestResource) {
+        float distance = Vector3.Distance(closest.ResourceTransform.position, transform.position);
 
-            if (closestResource != null && closestResource.ResourceTransform != null)
+        if(distance < Combat.MELEE_RANGE * 2.0f)
+        {
+            if (closest != closestResource)
             {
-                // Debug.Log("Changed closest from : " + closestResource.ResourceTransform + " / to : " + closest.ResourceTransform);
-                closestResource.ResourceTransform.localScale = Vector3.one;
+                closestResourceSequence?.Kill();
+
+                closestResourceSequence = DOTween.Sequence();
+                closestResourceSequence.Append(closest.ResourceTransform.DOScale(new Vector3(0.95f, 1.05f, 1.0f), 0.15f));
+                closestResourceSequence.SetLoops(int.MaxValue, LoopType.Yoyo);
+
+                // TODO : add to shared inventory
+                closestResourceSequence.onStepComplete = () => {
+                    if (distance < closestEnnemiDistance)
+                    {
+                        inventory.AddResource(closest.Controller.resourceType, 1);
+                    }
+                };
+
+                closestResource = closest;
             }
-            closest.ResourceTransform.localScale = Vector3.one * 1.3f;
-            closestResource = closest;
+
         }
+        else
+        {
+            closestResourceSequence?.Kill();
+            closestResourceSequence = null;
+            closestResource = null;
+        }
+
+        closestResourceDistance = distance;
 
     }
 
@@ -95,25 +129,39 @@ public class PlayerController : MonoBehaviour
         }
 
         Ennemi closest = ManagerEnnemis.GetClosestEnnemi(transform.position);
-        if (closest == null)
+        if (closest == null || closest.Controller == null || closest.Controller.IsDestroyed())
         {
+            TargetMarkerObject.gameObject.SetActive(false);
             Debug.Log("No ennemi found");
             return;
         }
 
-        if (closest != closestEnnemi)
-        {
+        closestEnnemi = closest;
+       
 
-            if (closestEnnemi != null && closestEnnemi.Controller != null)
+        if (closestEnnemi != null && closestEnnemi.Combat.IsDestroyed() == false)
+        {
+            float distance = Vector3.Distance(transform.position, closestEnnemi.Combat.transform.position);
+            
+            if(distance < Combat.MELEE_RANGE * 1.5f)
             {
-                // Debug.Log("Changed closest from : " + closestResource.ResourceTransform + " / to : " + closest.ResourceTransform);
-                closestEnnemi.Controller.transform.localScale = Vector3.one;
+                if (TargetMarkerObject.TARGET != closestEnnemi.Combat.transform)
+                {
+                    TargetMarkerObject.FollowTarget(closest.Controller.transform, 2.0f);
+                    TargetMarkerObject.gameObject.SetActive(true);
+                }
+
+                if(Time.time - last_attack_time > 1.0 / Combat.MELEE_ATTACK_SPEED)
+                {
+                    if(Combat.TryAttackTarget(closestEnnemi.Combat.transform))
+                        last_attack_time = Time.time;
+                }
             }
-            closest.Controller.transform.localScale = Vector3.one * 1.3f;
-            closestEnnemi = closest;
+
         }
 
     }
+
 
     void UpdateMiniMapPlayerUI()
     {

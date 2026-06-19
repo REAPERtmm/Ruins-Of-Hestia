@@ -10,6 +10,7 @@ public enum EnnemiState : int
     Focus = 2,
 }
 
+
 public class EnnemiController : MonoBehaviour
 {
     [Header("References")]
@@ -35,7 +36,7 @@ public class EnnemiController : MonoBehaviour
     public Vector2Int InitRoom;
 
     bool CollideWithEdgeOfMap;
-    EnnemiState CurrentState;
+    [SerializeField] EnnemiState CurrentState;
     float TimeStateStarted = 0;
     float MaxTime = 0;
 
@@ -45,7 +46,7 @@ public class EnnemiController : MonoBehaviour
     Vector2 RoamingDirection;
 
     // Focus Variables
-    Transform Target;
+    [SerializeField] Transform Target;
 
     void Move(Vector2 Direction)
     {
@@ -54,6 +55,8 @@ public class EnnemiController : MonoBehaviour
         Vector3 movement = new Vector3(
                 Direction.x, 0, Direction.y
                 ) * UsedSpeed * Time.deltaTime;
+
+        Animation.SetFloat("Speed", UsedSpeed);
 
         Vector3 old_position = transform.position;
         Vector3 next_position = transform.position + movement;
@@ -92,6 +95,7 @@ public class EnnemiController : MonoBehaviour
     {
         TransitionStateTo(EnnemiState.Idle);
         MaxTime = Random.Range(IdleMinDuration, IdleMaxDuration);
+        Animation.SetBool("IsAgressive", false);
     }
 
     void TransitionToRoaming()
@@ -100,16 +104,19 @@ public class EnnemiController : MonoBehaviour
         float angle = Random.Range(0, Mathf.PI * 2.0f);
         RoamingDirection = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
         MaxTime = Random.Range(RoamingMinDuration, RoamingMaxDuration);
+        Animation.SetBool("IsAgressive", false);
     }
 
     void TransitionToFocus(Transform target)
     {
         TransitionStateTo(EnnemiState.Focus);
         Target = target;
+        Animation.SetBool("IsAgressive", true);
     }
 
     void UpdateIdle()
     {
+        Animation.SetFloat("Speed", 0.0f);
         foreach (var target in Targets)
         {
             float DistanceToTarget = (transform.position - target.position).magnitude;
@@ -172,6 +179,7 @@ public class EnnemiController : MonoBehaviour
         if(Combat.MELEE_RANGE * 0.9f > DistanceToTarget || Combat.IsAttacking)
         {
             Combat.AttackClosest();
+            Animation.SetFloat("Speed", 0.0f);
         }
         else
         {
@@ -179,6 +187,7 @@ public class EnnemiController : MonoBehaviour
             Vector2 NormalizedTargetDirection = new Vector2(TargetDirection.x, TargetDirection.z);
             NormalizedTargetDirection = NormalizedTargetDirection.normalized;
             Move(NormalizedTargetDirection);
+
         }
 
         if (DistanceToTarget > FocusMinDistance)
@@ -210,8 +219,6 @@ public class EnnemiController : MonoBehaviour
             case EnnemiState.Roaming: UpdateRoaming(); break;
             case EnnemiState.Focus: UpdateFocus(); break;
         }
-
-        Animation.SetInteger("State", (int)CurrentState);
     }
 
     private void OnDrawGizmos()

@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2608332848833542653}
   - component: {fileID: 2832259904401671804}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: MeleAttack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -60,7 +60,7 @@ GameObject:
   - component: {fileID: 3501330924733383421}
   - component: {fileID: 9006100102856583675}
   - component: {fileID: 5575413564525624420}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: HitBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -149,10 +149,10 @@ SphereCollider:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 192
+    m_Bits: 4294967295
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
   m_LayerOverridePriority: 1
   m_IsTrigger: 1
   m_ProvidesContacts: 0

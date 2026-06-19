@@ -21,6 +21,7 @@ public class HitBoxCallBack : MonoBehaviour
             return;
         }
 
+
         if (Hitted.Contains(other.transform) == false && otherCombat.GROUP != hitBoxAttack.GetCaster().GROUP)
         {
             hitBoxAttack.ProccessCollision(otherCombat);
@@ -34,4 +35,5 @@ public class HitBoxCallBack : MonoBehaviour
             }
         }
     }
+
 }
