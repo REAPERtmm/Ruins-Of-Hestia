@@ -33,7 +33,7 @@ public class PlayerController : MonoBehaviour
     InputAction ControlMove;
     InputAction ControlDash;
 
-    Inventory inventory;
+    public Inventory inventory;
 
     [SerializeField] ResourceDescriptor closestResource = null;
     [SerializeField] DG.Tweening.Sequence closestResourceSequence = null;

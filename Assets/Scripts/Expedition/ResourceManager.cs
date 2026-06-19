@@ -116,6 +116,9 @@ public class ResourceManager : MonoBehaviour
 
     public IEnumerable<ResourceDescriptor> GetAllResourceInRoom(Vector2Int room)
     {
+        if (room.x > ResourceByRoom.Length || room.y > ResourceByRoom.Length || room.x < 0 || room.y < 0)
+            yield return null;
+
         foreach(ResourceDescriptor resourceDescriptor in ResourceByRoom[room.x, room.y])
         {
             yield return resourceDescriptor;

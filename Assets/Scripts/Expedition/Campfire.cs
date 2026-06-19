@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 public class Campfire : MonoBehaviour
@@ -6,11 +8,17 @@ public class Campfire : MonoBehaviour
     [SerializeField] PlayerController Player;
     [SerializeField] RectTransform PannelEndOfMission;
 
-    public void LoadScene(string scene_name)
+    [SerializeField] TransitionManager _TransitionManager;
+
+    public void Continue( int scene )
     {
-        // tout doux : utiliser le scene manager de ethan
-        SceneManager.UnloadSceneAsync(SceneManager.GetActiveScene());
-        SceneManager.LoadScene(scene_name, LoadSceneMode.Single);
+        _TransitionManager.LoadExpedition( Player.inventory, scene );
+    }
+
+    public void ReturnVillage()
+    {
+        Inventory.Instance.Add(Player.inventory);
+        _TransitionManager.ReturnVillage();
     }
 
 
@@ -22,6 +30,15 @@ public class Campfire : MonoBehaviour
     void ClosePannel()
     {
         PannelEndOfMission.gameObject.SetActive(false);
+    }
+
+    private void Update()
+    {
+
+        if (Keyboard.current.vKey.wasPressedThisFrame)
+        {
+            Player.transform.position = transform.position;
+        }
     }
 
     private void OnTriggerEnter(Collider other)

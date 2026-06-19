@@ -121,14 +121,14 @@ public class Grid
         return occupied;
     }
 
-    public bool PlaceBuilding(Vector2 position, Building building, Transform buildingUiContainer)
+    public bool PlaceBuilding(Vector2 position, Building building, Transform buildingContainer, Transform buildingUiContainer)
     {
         if ( IsOccupied(position, building.Fondation) )
             return false;
 
         Inventory.Instance.Pay(building.GlobalBuildingData.PerLevelUpgradeCost);
 
-        GameObject gameObject = Object.Instantiate(building.Prefab, GridToWorld(position), Quaternion.identity);
+        GameObject gameObject = Object.Instantiate(building.Prefab, GridToWorld(position), Quaternion.identity, buildingContainer);
         BuildingScript script = gameObject.GetComponentInChildren<BuildingScript>();
         BuildingData data = new BuildingData();
         data.Descriptor = building;

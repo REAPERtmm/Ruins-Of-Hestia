@@ -74,7 +74,7 @@ public class VillageManager : MonoBehaviour
             BuildingTemplate.Add(template);
         }
 
-        Grid.PlaceBuilding(new Vector2( 17, 17), BuildingObjects[0], BuildingsUIContainer);
+        Grid.PlaceBuilding(new Vector2( 17, 17), BuildingObjects[0], BuildingsUIContainer, BuildingsContainer);
 
     }
 
@@ -242,7 +242,7 @@ public class VillageManager : MonoBehaviour
             return;
         }
 
-        if (!Grid.PlaceBuilding(_selectedBuildingPosition, building, BuildingsUIContainer))
+        if (!Grid.PlaceBuilding(_selectedBuildingPosition, building, BuildingsUIContainer, BuildingsContainer))
         {
             // TODO FEEDBACK CANT PLACE
             return;
