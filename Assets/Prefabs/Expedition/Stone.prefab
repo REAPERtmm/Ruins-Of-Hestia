@@ -12,6 +12,26 @@ PrefabInstance:
       propertyPath: resourceType
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1778680801475902487, guid: 312d09b9dd97ced4eab00ddd1db3dd1a, type: 3}
+      propertyPath: HitBeforeDestroy
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 1778680801475902487, guid: 312d09b9dd97ced4eab00ddd1db3dd1a, type: 3}
+      propertyPath: LootByHit.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1778680801475902487, guid: 312d09b9dd97ced4eab00ddd1db3dd1a, type: 3}
+      propertyPath: LootByHit.Array.data[0].amount
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1778680801475902487, guid: 312d09b9dd97ced4eab00ddd1db3dd1a, type: 3}
+      propertyPath: LootByHit.Array.data[0].probability
+      value: 0.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 1778680801475902487, guid: 312d09b9dd97ced4eab00ddd1db3dd1a, type: 3}
+      propertyPath: LootByHit.Array.data[0].resourceType
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5814342658374564470, guid: 312d09b9dd97ced4eab00ddd1db3dd1a, type: 3}
       propertyPath: m_LocalPosition.x
       value: 83.03886

@@ -27,7 +27,7 @@ public class CombatController : MonoBehaviour
     [SerializeField] EquipmentInstance DistanceWeapon;
 
     [Header("Hostility")]
-    [SerializeField] List<Transform> Targets = new List<Transform>();
+    [SerializeField] List<CombatController> Targets = new List<CombatController>();
 
     [Header("Parameters")]
     [SerializeField] EntityGroup MyGroup = EntityGroup.Ally;
@@ -48,6 +48,9 @@ public class CombatController : MonoBehaviour
 
     public bool ALIVE => CurrentHP > 0;
     public EntityGroup GROUP => MyGroup;
+
+    public float HP => CurrentHP;
+
     public float MAX_HP
     {
         get
@@ -306,7 +309,7 @@ public class CombatController : MonoBehaviour
         }
     }
 
-    public void RegisterTarget(Transform target) => Targets.Add(target);
+    public void RegisterTarget(CombatController target) => Targets.Add(target);
 
     private void Start()
     {
@@ -316,14 +319,14 @@ public class CombatController : MonoBehaviour
     public void UpdateClosest()
     {
         DistanceToClosest = float.MaxValue;
-        foreach(Transform t in Targets)
+        foreach(CombatController t in Targets)
         {
             if (t.gameObject.activeSelf == false) continue;
-            float distance = Vector3.Distance(t.position, transform.position);
+            float distance = Vector3.Distance(t.transform.position, transform.position);
             if(distance < DistanceToClosest)
             {
                 DistanceToClosest = distance;
-                ClosestTarget = t;
+                ClosestTarget = t.transform;
             }
         }
     }

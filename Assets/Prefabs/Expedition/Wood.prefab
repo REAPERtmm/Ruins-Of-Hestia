@@ -8,6 +8,34 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1778680801475902487, guid: 312d09b9dd97ced4eab00ddd1db3dd1a, type: 3}
+      propertyPath: HitBeforeDestroy
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1778680801475902487, guid: 312d09b9dd97ced4eab00ddd1db3dd1a, type: 3}
+      propertyPath: LootByHit.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1778680801475902487, guid: 312d09b9dd97ced4eab00ddd1db3dd1a, type: 3}
+      propertyPath: LootByHit.Array.data[0].amount
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1778680801475902487, guid: 312d09b9dd97ced4eab00ddd1db3dd1a, type: 3}
+      propertyPath: LootByHit.Array.data[1].amount
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1778680801475902487, guid: 312d09b9dd97ced4eab00ddd1db3dd1a, type: 3}
+      propertyPath: LootByHit.Array.data[0].probability
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1778680801475902487, guid: 312d09b9dd97ced4eab00ddd1db3dd1a, type: 3}
+      propertyPath: LootByHit.Array.data[1].probability
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1778680801475902487, guid: 312d09b9dd97ced4eab00ddd1db3dd1a, type: 3}
+      propertyPath: LootByHit.Array.data[1].resourceType
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 5814342658374564470, guid: 312d09b9dd97ced4eab00ddd1db3dd1a, type: 3}
       propertyPath: m_LocalPosition.x
       value: 83.03886
@@ -50,7 +78,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8948346124077971322, guid: 312d09b9dd97ced4eab00ddd1db3dd1a, type: 3}
       propertyPath: m_Name
-      value: Resource Variant
+      value: Wood
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
