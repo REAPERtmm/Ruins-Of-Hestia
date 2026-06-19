@@ -46,7 +46,8 @@ public class Farm : BuildingScript
                 Building = ProducingBuilding.Forge,
                 Name = craftJob.Recipe.RecipeName,
                 DayLeft = craftJob.RemainingCraftingTime,
-                Icon = craftJob.Recipe.Icon
+                Icon = craftJob.Recipe.Icon,
+                Quantity = craftJob.Recipe.Result.Amount
             });
         }
 

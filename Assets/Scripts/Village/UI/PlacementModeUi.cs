@@ -24,23 +24,23 @@ public class PlacementModeUi : MonoBehaviour
 
     private void Start()
     {
-        Vector3 placementPosition = new Vector3(0.0f, _StartY, 0.0f);
-        for (var i = 0; i < _villageManager.BuildingObjects.Count; ++i)
-        {
-            var buildInfos = _villageManager.BuildingObjects[i];
-            GameObject obj = Instantiate(_placementUiPrefab, _buildingsList.transform);
-            obj.transform.position += placementPosition;
-            placementPosition.y += _OffsetY;
-            obj.GetComponentInChildren<Image>().sprite = buildInfos.Visual.Preview;
-            obj.GetComponentInChildren<TMP_Text>().text = buildInfos.Name;
-
-            var copyI = i;
-            obj.GetComponentInChildren<Button>().onClick.AddListener(() =>
-            {
-                _clickSouce.Play();
-                _villageManager.StartPlacing(copyI);
-            });
-        }
+        // Vector3 placementPosition = new Vector3(0.0f, _StartY, 0.0f);
+        // for (var i = 0; i < _villageManager.BuildingObjects.Count; ++i)
+        // {
+        //     var buildInfos = _villageManager.BuildingObjects[i];
+        //     GameObject obj = Instantiate(_placementUiPrefab, _buildingsList.transform);
+        //     obj.transform.position += placementPosition;
+        //     placementPosition.y += _OffsetY;
+        //     obj.GetComponentInChildren<Image>().sprite = buildInfos.Visual.Preview;
+        //     obj.GetComponentInChildren<TMP_Text>().text = buildInfos.Name;
+        //
+        //     var copyI = i;
+        //     obj.GetComponentInChildren<Button>().onClick.AddListener(() =>
+        //     {
+        //         _clickSouce.Play();
+        //         _villageManager.StartPlacing(copyI);
+        //     });
+        // }
 
         _villageManager.OnVillageLevelUp += UpdatePlacement;
     }

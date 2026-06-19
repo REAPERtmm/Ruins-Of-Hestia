@@ -15,5 +15,7 @@ public class FarmRecipe : ScriptableObject
 
     public Sprite Icon;
 
+    public Sprite Background;
+
     public bool IsUnlocked = false;
 }

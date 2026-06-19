@@ -110,8 +110,10 @@ public class VillageManager : MonoBehaviour
 
                 if (tile.BuildingScript != null)
                 {
+                    if (tile.BuildingScript.OnClick() == false)
+                        return;
+
                     SelectedBuilding = tile.BuildingScript;
-                    tile.BuildingScript.OnClick();
                     UiManager.ViewModeGroup.SetActive(false);
                     CameraController.FocusOn(tile.BuildingScript.transform.position);
                 }

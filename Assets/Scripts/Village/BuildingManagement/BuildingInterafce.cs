@@ -40,22 +40,26 @@ public abstract class BuildingScript : MonoBehaviour
 
     public void Instantiate( Transform parent )
     {
-        GameObject obj = Instantiate(BuildingUIPrefab, parent);
-        BuildingUI = obj.GetComponent<BuildingsUI>();
+        if (BuildingUIPrefab)
+        {
+            GameObject obj = Instantiate(BuildingUIPrefab, parent);
+            BuildingUI = obj.GetComponent<BuildingsUI>();
+        }
 
         SFXPlayer.PlaySFX(_onPlace);
         InBuild.SetActive(true);
     }
 
-    public virtual void OnClick()
+    public virtual bool OnClick()
     {
         if (Data.DayLeftToBuild > 0)
-            return;
+            return false;
 
         SFXPlayer.PlaySFX(_onSelect);
 
         BuildingView.SetSelected( Data.Descriptor.Visual, true );
         BuildingUI.Open(this);
+        return true;
     }
 
     public virtual void OnUnselected()

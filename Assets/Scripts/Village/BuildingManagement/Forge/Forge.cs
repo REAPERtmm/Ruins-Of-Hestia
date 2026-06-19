@@ -59,7 +59,8 @@ public class Forge : BuildingScript
                 Building = ProducingBuilding.Forge,
                 Name = craftJob.Recipe.Result.EquipmentName,
                 DayLeft = craftJob.RemainingCraftingTime,
-                Icon = craftJob.Recipe.Result.Icon
+                Icon = craftJob.Recipe.Result.Icon,
+                Quantity = 1
             });
         }
 

@@ -26,7 +26,7 @@ public class FarmRecipeUI : MonoBehaviour
         if (recipe.IsUnlocked)
         {
             LockIcon.gameObject.SetActive(false);
-            Button.GetComponent<Image>().sprite = recipe.Icon;
+            Button.GetComponent<Image>().sprite = recipe.Background;
         }
         else
         {

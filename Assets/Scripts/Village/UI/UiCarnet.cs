@@ -14,6 +14,7 @@ public class UiCarnet : MonoBehaviour
 
     public void OnEnable()
     {
+        mCurrentProduction.Clear();
         foreach (var script in villageManager.Grid.BuildingScripts)
         {
 

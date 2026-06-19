@@ -17,5 +17,6 @@ MonoBehaviour:
     Type: 4
     Amount: 20
   CraftingTime: 1
-  Icon: {fileID: 21300000, guid: 057989e7d8bf11e47a6a9a7c644a9f48, type: 3}
+  Icon: {fileID: -917653955, guid: 057989e7d8bf11e47a6a9a7c644a9f48, type: 3}
+  Background: {fileID: -500534021, guid: 057989e7d8bf11e47a6a9a7c644a9f48, type: 3}
   IsUnlocked: 1
