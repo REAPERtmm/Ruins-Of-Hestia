@@ -16,17 +16,22 @@ public class PlayerController : MonoBehaviour
     [SerializeField] TargetMarker TargetMarkerObject;
     [SerializeField] EnnemiManager ManagerEnnemis;
     [SerializeField] ResourceManager ManagerResources;
+    [SerializeField] Image HealthBar;
     MapGeneration MapGenerationManager;
 
     [Header("Parameters")]
     [SerializeField] float Speed;
+    [SerializeField] float DashSpeed;
     [SerializeField] float Acceleration;
 
     Quaternion LookingToward;
     Vector2 Velocity = Vector2.zero;
+    Vector2 DashVelocity = Vector2.zero;
+    bool IsDashLocked = false;
 
     CharacterController characterController;
     InputAction ControlMove;
+    InputAction ControlDash;
 
     Inventory inventory;
 
@@ -58,6 +63,7 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         ControlMove = InputSystem.actions.FindAction("ExplorationMove");
+        ControlDash = InputSystem.actions.FindAction("ExplorationDash");
         characterController = GetComponent<CharacterController>();
         LookingToward = Quaternion.identity;
         if(INSTANCE == null)
@@ -101,7 +107,14 @@ public class PlayerController : MonoBehaviour
                 closestResourceSequence.onStepComplete = () => {
                     if (distance < closestEnnemiDistance)
                     {
-                        inventory.AddResource(closest.Controller.resourceType, 1);
+                        foreach (var loot in closest.Controller.LootByHit)
+                        {
+                            if (Random.Range(0, 1) < loot.probability)
+                            {
+                                inventory.AddResource(loot.resourceType, loot.amount);
+                            }
+                        }
+                        closest.Controller.DecrementHit();
                     }
                 };
 
@@ -180,12 +193,21 @@ public class PlayerController : MonoBehaviour
         PlayerMiniMapUI.rectTransform.localPosition = centered * RECT_RESCALED;
     }
 
+    IEnumerator LockDashForSecond(float time)
+    {
+        IsDashLocked = true;
+        yield return new WaitForSeconds(time);
+        IsDashLocked = false;
+    }
+
     void UpdateMovements()
     {
         const float COS45 = 0.70710678f;
         const float SIN45 = 0.70710678f;
 
         Vector2 Input = ControlMove.ReadValue<Vector2>();
+        bool IsDashing = ControlDash.IsPressed();
+
 
         Vector2 TowardedMove;
         if (Input.x != 0 || Input.y != 0)
@@ -199,14 +221,23 @@ public class PlayerController : MonoBehaviour
             CaliAnimator.SetBool("IsMoving", false);
         }
 
-        Velocity = Vector2.Lerp(Velocity, TowardedMove, Acceleration * Time.deltaTime);
+        if (IsDashing && !IsDashLocked)
+        { 
+            StartCoroutine(LockDashForSecond(.5f));
+            DashVelocity = TowardedMove.normalized * DashSpeed;
+        }
 
-        CaliAnimator.SetFloat("Speed", Velocity.magnitude);
+        Velocity = Vector2.Lerp(Velocity, TowardedMove, Acceleration * Time.deltaTime);
+        DashVelocity = Vector2.Lerp(DashVelocity, Vector2.zero, Acceleration * Time.deltaTime);
+
+        Vector2 current_velocity = Velocity + DashVelocity;
+
+        CaliAnimator.SetFloat("Speed", current_velocity.magnitude);
 
         Vector3 movement = new Vector3(
-                Velocity.x * COS45 + Velocity.y * SIN45,
+                current_velocity.x * COS45 + current_velocity.y * SIN45,
                 0,
-                -Velocity.x * SIN45 + Velocity.y * COS45
+                -current_velocity.x * SIN45 + current_velocity.y * COS45
                 ) * Speed * Time.deltaTime;
         characterController.Move(movement);
 
@@ -225,6 +256,7 @@ public class PlayerController : MonoBehaviour
         if (!isGrounded)
         {
             characterController.Move(-movement);
+            DashVelocity = Vector2.zero;
         }
         else if (Input.x != 0.0f || Input.y != 0.0f)
         {
@@ -239,6 +271,8 @@ public class PlayerController : MonoBehaviour
         UpdateMiniMapPlayerUI();
         UpdateResourceTarget();
         UpdateEnnemiTarget();
+
+        HealthBar.fillAmount = Combat.HP / Combat.MAX_HP;
     }
 
     private void OnDrawGizmos()
