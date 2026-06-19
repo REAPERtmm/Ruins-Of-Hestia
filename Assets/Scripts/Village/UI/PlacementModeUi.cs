@@ -12,6 +12,7 @@ public class PlacementModeUi : MonoBehaviour
     [FormerlySerializedAs("_container")]
     [Header("Shop")]
     [SerializeField] private GameObject _shopMenu;
+    [SerializeField] private GameObject _buildingsList;
     [SerializeField] private GameObject _placementUiPrefab;
 
     [SerializeField] private float _StartY = 50.0f;
@@ -27,7 +28,7 @@ public class PlacementModeUi : MonoBehaviour
         for (var i = 0; i < _villageManager.BuildingObjects.Count; ++i)
         {
             var buildInfos = _villageManager.BuildingObjects[i];
-            GameObject obj = Instantiate(_placementUiPrefab, _shopMenu.transform);
+            GameObject obj = Instantiate(_placementUiPrefab, _buildingsList.transform);
             obj.transform.position += placementPosition;
             placementPosition.y += _OffsetY;
             obj.GetComponentInChildren<Image>().sprite = buildInfos.Visual.Preview;

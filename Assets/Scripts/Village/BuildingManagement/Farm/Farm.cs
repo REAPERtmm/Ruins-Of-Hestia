@@ -28,8 +28,7 @@ public class Farm : BuildingScript
             Jobs[i].RemainingCraftingTime--;
 
             if (Jobs[i].RemainingCraftingTime <= 0)
-            {
-                Debug.Log("End Resource");
+            { 
                 Inventory.Instance.AddResource(Jobs[i].Recipe.Result.Type, Jobs[i].Recipe.Result.Amount);
                 Jobs.RemoveAt(i);
             }

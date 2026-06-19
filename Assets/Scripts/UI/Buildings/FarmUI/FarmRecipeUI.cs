@@ -4,16 +4,18 @@ using UnityEngine.UI;
 
 public class FarmRecipeUI : MonoBehaviour
 {
-    [SerializeField] private TMP_Text RecipeName;
-    [SerializeField] private TMP_Text Time;
-    [SerializeField] private TMP_Text Quantity;
-    [SerializeField] private Image RecipeIcon;
+    [SerializeField] private Button     Button;
+    [SerializeField] private TMP_Text   RecipeName;
+    [SerializeField] private TMP_Text   Time;
+    [SerializeField] private TMP_Text   Quantity;
+    [SerializeField] private Image      LockIcon;
 
     private FarmRecipe Recipe; 
     private Farm Farm; 
 
     public void Setup(FarmRecipe recipe, Farm farm)
     {
+        
         Recipe = recipe;
         Farm = farm;
 
@@ -21,13 +23,21 @@ public class FarmRecipeUI : MonoBehaviour
         Time.text = recipe.CraftingTime.ToString() + " cycles";
         Quantity.text = "+ " + recipe.Result.Amount.ToString();
 
-        if (recipe.Result != null)
-            RecipeIcon.sprite = recipe.Icon;
+        if (recipe.IsUnlocked)
+        {
+            LockIcon.gameObject.SetActive(false);
+            Button.GetComponent<Image>().sprite = recipe.Icon;
+        }
+        else
+        {
+            LockIcon.gameObject.SetActive(true);
+            Button.interactable = false;
+        }
+
     }
 
     public void OnClick()
-    {
-        Debug.Log("Start Farm");
+    { 
         Farm.StartCraft(Recipe);
     }
 }

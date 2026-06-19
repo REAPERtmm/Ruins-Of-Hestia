@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a010e4dffdc1f5a438326e8760b5460c, type: 3}
   m_Name: "Ma\xEFs"
   m_EditorClassIdentifier: Assembly-CSharp::FarmRecipe
-  RecipeName: "Ma\xEFs"
+  RecipeName: Corns
   Result:
     Type: 4
     Amount: 220
   CraftingTime: 7
-  Icon: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  Icon: {fileID: 0}
+  IsUnlocked: 0

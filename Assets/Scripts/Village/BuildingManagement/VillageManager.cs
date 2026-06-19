@@ -49,6 +49,9 @@ public class VillageManager : MonoBehaviour
     private List<GameObject> BuildingTemplate = new();
     private Vector2 _selectedBuildingPosition;
 
+    [Header("Camera")]
+    public VillageCameraController CameraController;
+
     private void Start()
     {
         DOTween.Init();
@@ -109,6 +112,8 @@ public class VillageManager : MonoBehaviour
                 {
                     SelectedBuilding = tile.BuildingScript;
                     tile.BuildingScript.OnClick();
+                    UiManager.ViewModeGroup.SetActive(false);
+                    CameraController.FocusOn(tile.BuildingScript.transform.position);
                 }
                 else
                 {
@@ -116,6 +121,8 @@ public class VillageManager : MonoBehaviour
                     {
                         SelectedBuilding.OnUnselected();
                         SelectedBuilding = null;
+                        UiManager.ViewModeGroup.SetActive(true);
+                        CameraController.CancelFocus();
                     }
                 }
             }

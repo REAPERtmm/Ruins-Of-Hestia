@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a010e4dffdc1f5a438326e8760b5460c, type: 3}
   m_Name: "Bl\xE9s"
   m_EditorClassIdentifier: Assembly-CSharp::FarmRecipe
-  RecipeName: "Bl\xE9s"
+  RecipeName: Wheats
   Result:
     Type: 4
-    Amount: 45
-  CraftingTime: 2
-  Icon: {fileID: 21300000, guid: 7929be36b7b29334ab9ddce0eb99ac83, type: 3}
+    Amount: 20
+  CraftingTime: 1
+  Icon: {fileID: 21300000, guid: 057989e7d8bf11e47a6a9a7c644a9f48, type: 3}
+  IsUnlocked: 1

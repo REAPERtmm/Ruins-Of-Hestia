@@ -14,4 +14,6 @@ public class FarmRecipe : ScriptableObject
     public int CraftingTime;
 
     public Sprite Icon;
+
+    public bool IsUnlocked = false;
 }
