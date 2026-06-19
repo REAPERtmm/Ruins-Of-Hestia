@@ -82,6 +82,7 @@ public class ForgeRollItemInformation : MonoBehaviour
         }
 
         CostUI.SetTrait(TraitInformationTransform);
+        CostUI.UpdateGemsInventoryUI();
 
         SubscribeToTraitEvents();
     }

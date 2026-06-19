@@ -9,7 +9,7 @@ public class ForgeCraftItemInformation : MonoBehaviour
 
     [SerializeField] private Button CraftButton;
 
-    [SerializeField] private ForgeUI forgeUI;
+    public ForgeUI forgeUI;
 
     private List<ResourcesCost> Costs = new();
     private ForgeRecipe CurrentRecipe;

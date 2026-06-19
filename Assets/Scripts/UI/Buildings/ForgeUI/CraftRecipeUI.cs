@@ -6,24 +6,20 @@ public class CraftRecipeUI : MonoBehaviour
 {
     [SerializeField] private TMP_Text RecipeName;
     [SerializeField] private Image RecipeIcon;
+    [SerializeField] private ForgeCraftItemInformation info;
 
-    private ForgeRecipe Recipe;
+    private ForgeRecipe Recipe; 
 
-    private ForgeCraftItemInformation InfoPanel;
-
-    public void Setup(ForgeRecipe recipe, ForgeCraftItemInformation infoPanel)
+    public void Setup(ForgeRecipe recipe, ForgeUI Ui)
     {
-        Recipe = recipe;
-        InfoPanel = infoPanel;
+        Recipe = recipe; 
 
         RecipeName.text = recipe.Result.EquipmentName;
 
         if (recipe.Result != null)
             RecipeIcon.sprite = recipe.Result.Icon;
-    }
 
-    public void OnClick()
-    {
-        InfoPanel.Show(Recipe);
-    }
+        info.forgeUI = Ui;
+        info.Show(recipe);
+    } 
 }

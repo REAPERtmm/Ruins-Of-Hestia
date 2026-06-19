@@ -1,28 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
-
-
 
 public class RollCostUI : MonoBehaviour
 {
     [SerializeField] private TMP_Text Tier;
-    [SerializeField] private TraitInformation TraitPrefab; 
-    [SerializeField] private List<GemImage> Image; 
+    [SerializeField] private TraitInformation TraitPrefab;
+     
+    [SerializeField] private List<GemImage> GemSprites;
+     
+    [SerializeField] private List<GemsInfo> Text;
+    [SerializeField] private TMP_FontAsset Font;
 
     private EquipmentInstance EquipmentInstance;
-
 
     [Serializable]
     private struct GemImage
     {
-        public GemType Type;
+        public GemType GemType;
         public Sprite Sprite;
+    }
+
+    [Serializable]
+    private struct GemsInfo
+    {
+        public GemType GemType;
+        public TMP_Text Text;
     }
 
     public void SetEquipementInstance(EquipmentInstance equipmentInstance)
@@ -53,7 +59,7 @@ public class RollCostUI : MonoBehaviour
     }
 
     public void SetTrait(Transform parent)
-    { 
+    {
         foreach (Transform child in parent)
         {
             Destroy(child.gameObject);
@@ -62,7 +68,16 @@ public class RollCostUI : MonoBehaviour
         foreach (var trait in EquipmentInstance.Traits)
         {
             TraitInformation info = Instantiate(TraitPrefab, parent);
-            info.Initialize(trait); 
+            info.Initialize(trait);
+        }
+    } 
+
+    public void UpdateGemsInventoryUI()
+    {
+        foreach (var gemsInfo in Text)
+        {
+            if (gemsInfo.Text != null)
+                gemsInfo.Text.text = Inventory.Instance.GetGemAmount(gemsInfo.GemType).ToString();
         }
     }
 
@@ -75,7 +90,6 @@ public class RollCostUI : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-
         foreach (var trait in EquipmentInstance.Traits)
         {
             if (!trait.IsLocked)
@@ -85,7 +99,9 @@ public class RollCostUI : MonoBehaviour
 
             if (index >= 0)
             {
-                costs[index].Qte += trait.Cost.Qte;
+                var existing = costs[index];
+                existing.Qte += trait.Cost.Qte;
+                costs[index] = existing;
             }
             else
             {
@@ -97,20 +113,27 @@ public class RollCostUI : MonoBehaviour
             }
         }
 
-        int basePurpleCost = 5;
+        const int basePurpleCost = 5;
         int numLockedTraits = EquipmentInstance.Traits.Count(t => t.IsLocked) + 1;
+        int purpleQte = numLockedTraits * basePurpleCost;
 
-        costs.Add(new GemsCost
+        int purpleIndex = costs.FindIndex(c => c.Type == GemType.Purple);
+        if (purpleIndex >= 0)
         {
-            Type = GemType.Purple,
-            Qte = numLockedTraits * basePurpleCost,
-        });
+            var existing = costs[purpleIndex];
+            existing.Qte += purpleQte;
+            costs[purpleIndex] = existing;
+        }
+        else
+        {
+            costs.Add(new GemsCost { Type = GemType.Purple, Qte = purpleQte });
+        }
 
         foreach (var cost in costs)
         {
             GameObject go = new GameObject("GemImage");
             go.transform.SetParent(parent, false);
-            go.transform.localScale = Vector3.one * 2f;
+            go.transform.localScale = Vector3.one;
 
             Image image = go.AddComponent<Image>();
             image.sprite = GetGemSprite(cost.Type);
@@ -123,26 +146,20 @@ public class RollCostUI : MonoBehaviour
 
             TextMeshProUGUI text = goText.AddComponent<TextMeshProUGUI>();
             text.text = cost.Qte.ToString();
-            text.fontSize = 18;
+            text.fontSize = 24;
             text.color = Color.black;
+            text.font = Font;
 
             RectTransform rectText = goText.GetComponent<RectTransform>();
-            rectText.anchoredPosition = new Vector2(100, -25);
+            rectText.anchoredPosition = new Vector2(145, -50);
         }
     }
 
     private Sprite GetGemSprite(GemType type)
     {
-        return type switch
-        {
-            GemType.Red => Image.Find(g => g.Type == GemType.Red).Sprite,
-            GemType.Blue => Image.Find(g => g.Type == GemType.Blue).Sprite,
-            GemType.Green => Image.Find(g => g.Type == GemType.Green).Sprite,
-            GemType.Orange => Image.Find(g => g.Type == GemType.Orange).Sprite,
-            GemType.Yellow => Image.Find(g => g.Type == GemType.Yellow).Sprite,
-            GemType.Purple => Image.Find(g => g.Type == GemType.Purple).Sprite,
-            _ => throw new ArgumentOutOfRangeException(),
-        };
+        GemImage gemImage = GemSprites.FirstOrDefault(g => g.GemType == type);
+
+        return gemImage.Sprite;
     }
 
     public void Clear()
@@ -150,4 +167,4 @@ public class RollCostUI : MonoBehaviour
         EquipmentInstance = null;
         Tier.text = "I";
     }
-} 
+}
