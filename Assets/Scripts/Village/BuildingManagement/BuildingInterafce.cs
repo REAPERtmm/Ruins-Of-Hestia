@@ -47,7 +47,13 @@ public abstract class BuildingScript : MonoBehaviour
         }
 
         SFXPlayer.PlaySFX(_onPlace);
+
         InBuild.SetActive(true);
+        Build.SetActive(false);
+        JustBuild.SetActive(false);
+
+        if (Data.DayLeftToBuild <= 0)
+            MakeBuildingVisible();
     }
 
     public virtual bool OnClick()
@@ -58,14 +64,14 @@ public abstract class BuildingScript : MonoBehaviour
         SFXPlayer.PlaySFX(_onSelect);
 
         BuildingView.SetSelected( Data.Descriptor.Visual, true );
-        BuildingUI.Open(this);
+        BuildingUI?.Open(this);
         return true;
     }
 
     public virtual void OnUnselected()
     {
         BuildingView.SetSelected( Data.Descriptor.Visual, false );
-        BuildingUI.Close();
+        BuildingUI?.Close();
     }
 
     public virtual void PassDay()
@@ -76,14 +82,19 @@ public abstract class BuildingScript : MonoBehaviour
         Data.DayLeftToBuild--;
         if (Data.DayLeftToBuild <= 0)
         {
-            BuildingView.View.gameObject.SetActive(true);
-
-            JustBuild.SetActive(true);
-            Build.SetActive(true);
-            InBuild.SetActive(false);
-
-            SFXPlayer.PlaySFX(_upgradeSound);
+            MakeBuildingVisible();
         }
+    }
+
+    private void MakeBuildingVisible()
+    {
+        BuildingView.View.gameObject.SetActive(true);
+
+        JustBuild.SetActive(true);
+        Build.SetActive(true);
+        InBuild.SetActive(false);
+
+        SFXPlayer.PlaySFX(_upgradeSound);
     }
 
     public abstract BuildingProduction[] GetCurrentProduction();

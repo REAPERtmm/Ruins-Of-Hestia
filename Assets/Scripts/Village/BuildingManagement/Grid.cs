@@ -79,7 +79,7 @@ public class Grid
 
     public bool CursorToGrid(out Vector2 point)
     {
-        Vector2 screenPos = Mouse.current.position.ReadValue();
+        Vector2 screenPos = Touchscreen.current.primaryTouch.position.ReadValue();
         Ray ray = Camera.main.ScreenPointToRay(screenPos);
 
         if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, _layerMask))
@@ -144,7 +144,6 @@ public class Grid
             }
         }
         gameObject.transform.GetChild(0).gameObject.SetActive(false);
-        gameObject.transform.GetChild(1).gameObject.SetActive(false);
         script.Instantiate( buildingUiContainer );
         script.OnUnselected();
         BuildingScripts.Add( script );

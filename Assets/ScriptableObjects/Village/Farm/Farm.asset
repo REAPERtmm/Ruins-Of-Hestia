@@ -23,6 +23,12 @@ MonoBehaviour:
     Default: {fileID: 2100000, guid: 1b7c9c354eff8ef438f64d591c0d9ac2, type: 2}
   GlobalBuildingData:
     BuildingDuration: 2
-    BaseBuildingCount: 1
+    BaseBuildingCount: 4
     PerLevelBuildCountAdd: 
-    PerLevelUpgradeCost: []
+    PerLevelUpgradeCost:
+    - Type: 0
+      Qte: 100
+    - Type: 1
+      Qte: 40
+    - Type: 3
+      Qte: 200
