@@ -132,7 +132,7 @@
                 {
                     "name": "",
                     "id": "258203c1-81bb-4cb5-8fc9-98c5c3d80373",
-                    "path": "<AndroidJoystick>/stick",
+                    "path": "<Gamepad>/leftStick",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Touch",
@@ -147,6 +147,17 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
+                    "action": "ExplorationDash",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7c4f368c-009b-4909-b3da-4729744aae95",
+                    "path": "<Gamepad>/buttonWest",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Touch",
                     "action": "ExplorationDash",
                     "isComposite": false,
                     "isPartOfComposite": false
