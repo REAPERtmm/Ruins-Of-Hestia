@@ -74,11 +74,18 @@ public class ResourceManager : MonoBehaviour
         resourceDescriptor.Room = room;
         resourceDescriptor.ResourceTransform = instance.transform;
         resourceDescriptor.Controller = instance.transform.GetComponent<ResourceController>();
+        resourceDescriptor.Controller.DescriptorReference = resourceDescriptor;
 
         ResourceByRoom[room.x, room.y].Add(resourceDescriptor);
 
 
         return instance.transform;
+    }
+
+    public void RemoveResource(ResourceController resourceController)
+    {
+        Destroy(resourceController.gameObject);
+        ResourceByRoom[resourceController.DescriptorReference.Room.x, resourceController.DescriptorReference.Room.y].Remove(resourceController.DescriptorReference);
     }
 
     public ResourceDescriptor GetClosestResource(Vector3 position)
@@ -109,6 +116,9 @@ public class ResourceManager : MonoBehaviour
 
     public IEnumerable<ResourceDescriptor> GetAllResourceInRoom(Vector2Int room)
     {
+        if (room.x > ResourceByRoom.Length || room.y > ResourceByRoom.Length || room.x < 0 || room.y < 0)
+            yield return null;
+
         foreach(ResourceDescriptor resourceDescriptor in ResourceByRoom[room.x, room.y])
         {
             yield return resourceDescriptor;

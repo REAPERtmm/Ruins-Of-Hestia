@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using NUnit.Framework;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -9,14 +11,15 @@ public class PlacementModeUi : MonoBehaviour
     [SerializeField] private VillageManager _villageManager;
     [SerializeField] private AudioSource _clickSouce;
 
+    [SerializeField] private Sprite _Button;
+
     [FormerlySerializedAs("_container")]
     [Header("Shop")]
     [SerializeField] private GameObject _shopMenu;
     [SerializeField] private GameObject _buildingsList;
     [SerializeField] private GameObject _placementUiPrefab;
 
-    [SerializeField] private float _StartY = 50.0f;
-    [SerializeField] private float _OffsetY = 125.0f;
+    [SerializeField] List<Vector3> _placementUiPositions;
 
     [Header("Confirmation menu")]
     [SerializeField]
@@ -24,23 +27,38 @@ public class PlacementModeUi : MonoBehaviour
 
     private void Start()
     {
-        // Vector3 placementPosition = new Vector3(0.0f, _StartY, 0.0f);
-        // for (var i = 0; i < _villageManager.BuildingObjects.Count; ++i)
-        // {
-        //     var buildInfos = _villageManager.BuildingObjects[i];
-        //     GameObject obj = Instantiate(_placementUiPrefab, _buildingsList.transform);
-        //     obj.transform.position += placementPosition;
-        //     placementPosition.y += _OffsetY;
-        //     obj.GetComponentInChildren<Image>().sprite = buildInfos.Visual.Preview;
-        //     obj.GetComponentInChildren<TMP_Text>().text = buildInfos.Name;
-        //
-        //     var copyI = i;
-        //     obj.GetComponentInChildren<Button>().onClick.AddListener(() =>
-        //     {
-        //         _clickSouce.Play();
-        //         _villageManager.StartPlacing(copyI);
-        //     });
-        // }
+        for (var i = 0; i < _villageManager.BuildingObjects.Count; ++i)
+        {
+            var buildInfos = _villageManager.BuildingObjects[i];
+            if ( buildInfos.GlobalBuildingData.BaseBuildingCount <= 0)
+                continue;
+            GameObject obj = Instantiate(_placementUiPrefab, _buildingsList.transform);
+            obj.GetComponent<RectTransform>().localPosition = _placementUiPositions[i];
+            var componentInChildren = obj.GetComponentInChildren<ShopCase>();
+            foreach (var resourcesCost in buildInfos.GlobalBuildingData.PerLevelUpgradeCost)
+            {
+                switch (resourcesCost.Type)
+                {
+                    case ResourceType.Wood:
+                        componentInChildren.PriceWood.text = resourcesCost.Qte.ToString();
+                        break;
+                    case ResourceType.Leaves:
+                        componentInChildren.PriceLeaves.text = resourcesCost.Qte.ToString();
+                        break;
+                    case ResourceType.Stone:
+                        componentInChildren.PriceStone.text = resourcesCost.Qte.ToString();
+                        break;
+                }
+
+            }
+
+            var copyI = i;
+            obj.GetComponentInChildren<Button>().onClick.AddListener(() =>
+            {
+                _clickSouce.Play();
+                _villageManager.StartPlacing(copyI);
+            });
+        }
 
         _villageManager.OnVillageLevelUp += UpdatePlacement;
     }

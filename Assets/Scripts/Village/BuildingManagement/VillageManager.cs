@@ -74,6 +74,8 @@ public class VillageManager : MonoBehaviour
             BuildingTemplate.Add(template);
         }
 
+        Grid.PlaceBuilding(new Vector2( 17, 17), BuildingObjects[0], BuildingsUIContainer, BuildingsContainer);
+
     }
 
     private void Update()
@@ -96,7 +98,8 @@ public class VillageManager : MonoBehaviour
         if (EventSystem.current.IsPointerOverGameObject())
             return;
 
-        if (Mouse.current.leftButton.wasPressedThisFrame)
+
+        if (Touchscreen.current.primaryTouch.press.wasPressedThisFrame)
         {
             if (Grid.CursorToGrid( out Vector2 gridPos))
             {
@@ -108,14 +111,17 @@ public class VillageManager : MonoBehaviour
                 if (tile == null)
                     return;
 
-                if (tile.BuildingScript != null)
+                if (tile.BuildingScript != null && !SelectedBuilding)
                 {
                     if (tile.BuildingScript.OnClick() == false)
                         return;
 
                     SelectedBuilding = tile.BuildingScript;
                     UiManager.ViewModeGroup.SetActive(false);
-                    CameraController.FocusOn(tile.BuildingScript.transform.position);
+                    Vector3 pos = tile.BuildingScript.transform.position;
+                    pos.z += tile.BuildingData.Descriptor.Fondation.Height * -1.0f;
+                    pos.x += tile.BuildingData.Descriptor.Fondation.Width;
+                    CameraController.FocusOn(pos);
                 }
                 else
                 {
@@ -145,7 +151,7 @@ public class VillageManager : MonoBehaviour
         if (Grid.CursorToGrid(out Vector2 gridPos))
         {
 
-            if (!Mouse.current.leftButton.wasPressedThisFrame)
+            if (!Touchscreen.current.primaryTouch.press.wasPressedThisFrame)
                 return;
 
             // Build preview
@@ -165,8 +171,16 @@ public class VillageManager : MonoBehaviour
 
     public void StartPlacing(int index)
     {
+        var template = BuildingTemplate[index];
+        Building building = BuildingObjects[index];
+        if (!Inventory.Instance.CanAfford(building.GlobalBuildingData.PerLevelUpgradeCost))
+        {
+            UiResource.Highlight(building.GlobalBuildingData.PerLevelUpgradeCost);
+            return;
+        }
+
         PlacingBuildingIndex = index;
-        BuildingTemplate[PlacingBuildingIndex].SetActive(true);
+        template.SetActive(true);
 
         if (Grid.CenterOfScreenToPoint(out Vector2 gridPos))
         {
@@ -222,14 +236,13 @@ public class VillageManager : MonoBehaviour
     public void ConfirmPlacement()
     {
         Building building = BuildingObjects[PlacingBuildingIndex];
-        // Consume ressources
         if (!Inventory.Instance.CanAfford(building.GlobalBuildingData.PerLevelUpgradeCost))
         {
             UiResource.Highlight(building.GlobalBuildingData.PerLevelUpgradeCost);
             return;
         }
 
-        if (!Grid.PlaceBuilding(_selectedBuildingPosition, building, BuildingsUIContainer))
+        if (!Grid.PlaceBuilding(_selectedBuildingPosition, building, BuildingsUIContainer, BuildingsContainer))
         {
             // TODO FEEDBACK CANT PLACE
             return;
@@ -255,11 +268,6 @@ public class VillageManager : MonoBehaviour
     {
         ToViewMode();
         UiBillboard.SetActive(false);
-    }
-
-    public void ToExpeditionMap()
-    {
-        SceneManager.LoadScene(2);
     }
 
     private void PlacePreviewAt( Vector2 gridPos )

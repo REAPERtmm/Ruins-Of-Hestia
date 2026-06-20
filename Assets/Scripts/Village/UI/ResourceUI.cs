@@ -14,6 +14,7 @@ public class ResourceUI : MonoBehaviour
     [SerializeField] private GameObject Leaves;
     [SerializeField] private GameObject Food;
 
+    Vector3 originalScale;
     private GameObject[] _Resources;
 
     private void Start()
@@ -25,14 +26,16 @@ public class ResourceUI : MonoBehaviour
             Leaves,
             Food,
         };
+        originalScale = _Resources[0].transform.localScale;
+
     }
 
     public void Highlight( ResourceType type )
     {
-        _Resources[(int)type].transform.DOScale(MaxScale, AnimationSpeed).SetEase( Ease.InElastic )
+        _Resources[(int)type].transform.DOScale(MaxScale, AnimationSpeed).SetEase( Ease.Linear )
             .OnComplete(() =>
             {
-                _Resources[(int)type].transform.DOScale(1.0f, AnimationSpeed).SetEase(Ease.OutElastic);
+                _Resources[(int)type].transform.DOScale(originalScale, AnimationSpeed).SetEase(Ease.Linear);
             });
     }
 

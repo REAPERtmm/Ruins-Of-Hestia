@@ -18,7 +18,7 @@ public class EnnemiController : MonoBehaviour
     [SerializeField] Transform Model;
     [SerializeField] CapsuleCollider Collider;
     [SerializeField] CombatController Combat;
-    [SerializeField] List<Transform> Targets;
+    [SerializeField] List<CombatController> Targets;
 
     [Header("Parameters")]
     [SerializeField] float RoamingMovementSpeed;
@@ -119,11 +119,12 @@ public class EnnemiController : MonoBehaviour
         Animation.SetFloat("Speed", 0.0f);
         foreach (var target in Targets)
         {
-            float DistanceToTarget = (transform.position - target.position).magnitude;
+            if (target.IsDestroyed() || target.ALIVE == false) continue;
+            float DistanceToTarget = (transform.position - target.transform.position).magnitude;
 
             if (DistanceToTarget < DetectionRadiusIdle)
             {
-                TransitionToFocus(target);
+                TransitionToFocus(target.transform);
                 return;
             }
         }
@@ -148,11 +149,12 @@ public class EnnemiController : MonoBehaviour
 
         foreach (var target in Targets)
         {
-            float DistanceToTarget = (transform.position - target.position).magnitude;
+            if (target.IsDestroyed() || target.ALIVE == false) continue;
+            float DistanceToTarget = (transform.position - target.transform.position).magnitude;
 
             if (DistanceToTarget < DetectionRadiusRoaming)
             {
-                TransitionToFocus(target);
+                TransitionToFocus(target.transform);
                 return;
             }
         }
@@ -199,10 +201,10 @@ public class EnnemiController : MonoBehaviour
 
     private void Start()
     {
-        Targets.Add(PlayerController.INSTANCE.transform);
+        Targets.Add(PlayerController.INSTANCE.GetComponent<CombatController>());
         // TODO : Add Iris
 
-        PlayerController.INSTANCE.Combat.RegisterTarget(transform);
+        PlayerController.INSTANCE.Combat.RegisterTarget(GetComponent<CombatController>());
 
         for (int i = 0; i < Targets.Count; i++)
         {

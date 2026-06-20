@@ -19,7 +19,8 @@ public class Inventory : MonoBehaviour
 
     private void Awake()
     {
-        Instance = this;
+        if ( ! Instance )
+            Instance = this;
     }
 
     public void Update()
@@ -178,5 +179,18 @@ public class Inventory : MonoBehaviour
         {
             RemoveResource(cost.Type, cost.Qte);
         }
+    }
+
+    public void Add(Inventory other)
+    {
+        gems.ForEach(stack =>
+        {
+            stack.Amount += other.GetGemAmount(stack.Type);
+        });
+
+        resources.ForEach(stack =>
+        {
+            stack.Amount += other.GetResourceAmount(stack.Type);
+        });
     }
 }
