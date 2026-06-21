@@ -54,4 +54,9 @@ public class TransitionManager : MonoBehaviour
         }
 
     }
+
+    public void Quit()
+    {
+        Application.Quit();
+    }
 }
