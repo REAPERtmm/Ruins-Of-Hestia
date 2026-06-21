@@ -15,6 +15,7 @@ public class HitBoxAttack : MonoBehaviour
     [SerializeField] int Penetration = 1;
     [SerializeField] HitInstanceDescriptor HitInstance;
     [SerializeField] Collider SelfCollider;
+    [SerializeField] AudioSource HitmarkerSFX;
 
     Vector3 LastPosition = Vector3.zero;
     bool ShouldFaceDirection;
@@ -29,7 +30,7 @@ public class HitBoxAttack : MonoBehaviour
         transform.rotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
 
         Transform collider_transform = SelfCollider.transform;
-        collider_transform.localPosition = offset;
+        collider_transform.localPosition = SelfCollider.transform.localPosition + offset;
         collider_transform.localScale = Vector3.one * range;
     }
 
@@ -56,6 +57,7 @@ public class HitBoxAttack : MonoBehaviour
 
     public void ProccessCollision(CombatController other)
     {
+        HitmarkerSFX.Play();
         other.TakeDamage(GetCaster(), true);
     }
 }

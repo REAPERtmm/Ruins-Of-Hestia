@@ -27,6 +27,7 @@ public struct TileGroup
     }
 
     public bool IsEmpty() {  return !TL && !TR && !BR && !BL; }
+    public bool IsFull() {  return TL && TR && BR && BL; }
 }
 
 [CreateAssetMenu(fileName = "MeshTileGroup", menuName = "ScriptableObject/MeshTileGroup")]

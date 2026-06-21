@@ -355,6 +355,7 @@ public struct RoomObject
     public Transform Terrain;
     public Transform Ennemies;
     public Transform Resources;
+    public Transform Folliage;
 }
 
 public class MapGeneration : MonoBehaviour
@@ -376,6 +377,7 @@ public class MapGeneration : MonoBehaviour
     [SerializeField] GameObject RoomPrefab;
     [SerializeField] GameObject EnnemiPrefab;
     [SerializeField] GameObject ResourcePrefab;
+    [SerializeField] GameObject FolliagePrefab;
 
     [Header("Water")]
     [SerializeField] GameObject WaterObject;
@@ -385,6 +387,7 @@ public class MapGeneration : MonoBehaviour
     [SerializeField] Vector2 RoomScale;
     [SerializeField] Vector2Int RoomCount;
     [SerializeField] Vector2Int TilePerRoom;
+    [SerializeField] int FolliageCountPerRoom;
 
     [Header("Debug")]
     [SerializeField] bool DebugTiles;
@@ -434,9 +437,14 @@ public class MapGeneration : MonoBehaviour
         ResourceContainer.transform.parent = instance.transform;
         ResourceContainer.transform.localScale = inverse_scale;
 
+        GameObject FolliageContainer = new GameObject("FolliageContainer");
+        FolliageContainer.transform.parent = instance.transform;
+        FolliageContainer.transform.localScale = inverse_scale;
+
         roomObject.Terrain = instance.transform;
         roomObject.Ennemies = EnnemiContainer.transform;
         roomObject.Resources = ResourceContainer.transform;
+        roomObject.Folliage = FolliageContainer.transform;
         roomObject.RoomPosition = new Vector2Int(x_room, y_room);
 
         return roomObject;
@@ -468,6 +476,13 @@ public class MapGeneration : MonoBehaviour
         instance.name = "Ennemi " + ManagerEnnemis.ENNEMIES_REGISTERED;
 
         instance.transform.position = position + random_offset;
+        return instance.transform;
+    }
+
+    Transform CreateFolliage(Vector3 position, in RoomObject obj)
+    {
+        GameObject instance = Instantiate(FolliagePrefab, obj.Folliage);
+        instance.transform.position = position;
         return instance.transform;
     }
 
@@ -565,6 +580,22 @@ public class MapGeneration : MonoBehaviour
                         in RoomObjects[x, y]
                         );
                 }
+
+                // for (int folliage = 0; folliage < FolliageCountPerRoom; ++folliage)
+                // {
+                //     Vector2Int TilePos;
+                //     do
+                //     {
+                //         TilePos = new Vector2Int(Random.Range(0, room.DualGridSize.x), Random.Range(0, room.DualGridSize.y));
+                //         Debug.Log("Current : \n" + room.DualGrid[TilePos.x, TilePos.y].TL + " | " + room.DualGrid[TilePos.x, TilePos.y].TR + "\n" + room.DualGrid[TilePos.x, TilePos.y].BL + " | " + room.DualGrid[TilePos.x, TilePos.y].BR);
+                //     }
+                //     while (room.DualGrid[TilePos.x, TilePos.y].IsFull() == false);
+                // 
+                //     CreateFolliage(
+                //             roomPosition + new Vector3(Factory.TileGroupScale.x * (TilePos.x + 0.5f), 0, Factory.TileGroupScale.y * (TilePos.y + 0.5f)),
+                //             in RoomObjects[x, y]
+                //     );
+                // }
             }
         }
 
