@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a010e4dffdc1f5a438326e8760b5460c, type: 3}
+  m_Name: "Bl\xE9s"
+  m_EditorClassIdentifier: Assembly-CSharp::FarmRecipe
+  RecipeName: Wheats
+  Result:
+    Type: 4
+    Amount: 20
+  CraftingTime: 1
+  Icon: {fileID: -917653955, guid: 057989e7d8bf11e47a6a9a7c644a9f48, type: 3}
+  Background: {fileID: -500534021, guid: 057989e7d8bf11e47a6a9a7c644a9f48, type: 3}
+  IsUnlocked: 1

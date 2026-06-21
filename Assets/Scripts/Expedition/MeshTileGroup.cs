@@ -1,7 +1,10 @@
-using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+
+#if UNITY_EDITOR
+using UnityEditor;
+using UnityEditor.UIElements;
+#endif
 
 public struct TileGroup
 {
@@ -22,6 +25,9 @@ public struct TileGroup
         rotated.BR = BL;
         return rotated;
     }
+
+    public bool IsEmpty() {  return !TL && !TR && !BR && !BL; }
+    public bool IsFull() {  return TL && TR && BR && BL; }
 }
 
 [CreateAssetMenu(fileName = "MeshTileGroup", menuName = "ScriptableObject/MeshTileGroup")]
@@ -34,6 +40,7 @@ public class MeshTileGroup : ScriptableObject
     public Mesh[] Models;
 }
 
+#if UNITY_EDITOR
 [CustomEditor(typeof(MeshTileGroup))]
 public class MeshTileGroupEditor : Editor
 {
@@ -80,3 +87,4 @@ public class MeshTileGroupEditor : Editor
     }
 }
 
+#endif

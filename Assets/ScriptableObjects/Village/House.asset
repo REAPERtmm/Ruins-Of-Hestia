@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbd84752a9272dc4d9d49adfc472b5c0, type: 3}
+  m_Name: House
+  m_EditorClassIdentifier: Assembly-CSharp::BuildingDescriptor
+  Name: House
+  Prefab: {fileID: 754247724783832685, guid: fab9d6d9107494c429b0aed9f7c1f8da, type: 3}
+  Fondation:
+    Width: 3
+    Height: 3
+  Visual:
+    Preview: {fileID: 21300000, guid: 40cbdcaad1babfd4386462362c2bccc6, type: 3}
+    Active: {fileID: 2100000, guid: 6fdbb1770af3fa34bb84f7969835feb1, type: 2}
+    Default: {fileID: 2100000, guid: f6d29df966682d3438b56c94d6eb1764, type: 2}
+  GlobalBuildingData:
+    BuildingDuration: 2
+    BaseBuildingCount: 2
+    PerLevelBuildCountAdd: 
+    PerLevelUpgradeCost:
+    - Type: 0
+      Qte: 100
+    - Type: 1
+      Qte: 50

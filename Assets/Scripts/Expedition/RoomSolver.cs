@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Drawing;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class RawRoom
@@ -91,8 +89,8 @@ public class RawRoom
 
         RawRoom raw = new RawRoom(RotateSize(rotation));
 
-        float half_x = (Size.x - 1) * 0.5f;
-        float half_y = (Size.y - 1) * 0.5f;
+        float half_x = (float)(Size.x - 1) * 0.5f;
+        float half_y = (float)(Size.y - 1) * 0.5f;
 
         for (int x = 0; x < Size.x; x++) {
             for (int y = 0; y < Size.y; y++)
@@ -101,8 +99,8 @@ public class RawRoom
                 float centered_y = (float)y - half_y;
 
                 Vector2Int new_coord = new Vector2Int(
-                    (int)(centered_x * matrix[0, 0] + centered_y * matrix[0, 1] + half_x),
-                    (int)(centered_x * matrix[1, 0] + centered_y * matrix[1, 1] + half_y)
+                    Mathf.RoundToInt(centered_x * matrix[0, 0] + centered_y * matrix[0, 1] + half_x),
+                    Mathf.RoundToInt(centered_x * matrix[1, 0] + centered_y * matrix[1, 1] + half_y)
                 );
 
                 raw.Tiles[new_coord.x, new_coord.y] = Tiles[x, y];
@@ -136,12 +134,31 @@ public class RawRoom
 public class RoomDescriptor
 {
     public RawRoom Raw;
+    public List<Vector2> NormalizedPositionSpawnEnnemies;
+    public List<Vector2> NormalizedPositionSpawnResources;
+    public Vector2 NormalizedPositionSpawnPlayer;
     // TODO : Add SpawnPoint, ennemi spawn, resource spawn, etc...
 }
 
 public class RoomResolver
 {
-    List<RawRoom> Raws;
+    public static RawRoom RoomSOToRawRoom(RoomSO room)
+    {
+        // TODO : Allow for different resolution of room
+
+        RawRoom output = new RawRoom(room.Size);
+        for (int x = 0; x < room.Size.x; x++)
+        {
+            for (int y = 0; y < room.Size.y; y++)
+            {
+                output.SetTile(x, y, room.GetTerrain(x, y));
+            }
+        }
+
+        return output;
+    }
+
+    RoomSO[] Rooms;
     Dictionary<LayoutLinking, List<RoomDescriptor>> Resolver;
 
     public RoomResolver()
@@ -149,25 +166,96 @@ public class RoomResolver
         Resolver = new();
     }
     
-    public void Process(List<RawRoom> raws, Vector2Int RoomSize)
+    public void Register(RawRoom raw, List<Vector2> ennemies, List<Vector2> resources, Vector2 player)
     {
-        Raws = raws;
+        if (Resolver.ContainsKey(raw.GetLinks()) == false)
+            Resolver.Add(raw.GetLinks(), new List<RoomDescriptor>());
 
-        for (int i = 0; i < Raws.Count; ++i)
+        RoomDescriptor desc = new RoomDescriptor();
+        desc.Raw = raw;
+        desc.NormalizedPositionSpawnEnnemies = ennemies;
+        desc.NormalizedPositionSpawnResources = resources;
+        desc.NormalizedPositionSpawnPlayer = player;
+
+        Resolver[raw.GetLinks()].Add(desc);
+    }
+
+    public void Process(RoomSO[] rooms, Vector2Int RoomSize)
+    {
+        Rooms = rooms;
+
+        for (int i = 0; i < Rooms.Length; ++i)
         {
-            for(int rotation = 0; rotation < 4; ++rotation)
+            RawRoom raw = RoomSOToRawRoom(Rooms[i]);
+            List<Vector2> ennemies = new List<Vector2>();
+            List<Vector2> resources = new List<Vector2>();
+            Vector2 player = new Vector2(
+                (Rooms[i].PlayerSpawn.x + 0.5f) / Rooms[i].Size.x,
+                (Rooms[i].PlayerSpawn.y + 0.5f) / Rooms[i].Size.y
+            );
+            
+            for (int x = 0; x < Rooms[i].Size.x; ++x)
             {
-                Vector2Int size = Raws[i].RotateSize(rotation);
-                if (size.x != RoomSize.x || size.y != RoomSize.y) continue;
+                for (int y = 0; y < Rooms[i].Size.y; ++y)
+                {
+                    if (Rooms[i].GetEnnemi(x, y))
+                    {
+                        ennemies.Add(new Vector2(
+                                (x + 0.5f) / Rooms[i].Size.x,
+                                (y + 0.5f) / Rooms[i].Size.y
+                            ));
+                    }
 
-                RawRoom new_raw = Raws[i].Rotate(rotation);
-                if(Resolver.ContainsKey(new_raw.GetLinks()) == false)
-                    Resolver.Add(new_raw.GetLinks(), new List<RoomDescriptor>());
+                    if (Rooms[i].GetResource(x, y))
+                    {
+                        resources.Add(new Vector2(
+                                (x + 0.5f) / Rooms[i].Size.x,
+                                (y + 0.5f) / Rooms[i].Size.y
+                            ));
+                    }
+                }
+            }
 
-                RoomDescriptor desc = new RoomDescriptor();
-                desc.Raw = new_raw;
+            for (int rotation = 0; rotation < 4; ++rotation)
+            {
+                float[,] matrix = new float[2, 2]
+                {
+                     { Mathf.Cos(Mathf.PI * 0.5f * rotation), Mathf.Sin(Mathf.PI * 0.5f * rotation) },
+                     { -Mathf.Sin(Mathf.PI * 0.5f * rotation), Mathf.Cos(Mathf.PI * 0.5f * rotation) },
+                };
 
-                Resolver[new_raw.GetLinks()].Add(desc);
+                RawRoom new_raw = raw.Rotate(rotation);
+                List<Vector2> new_ennemies = new List<Vector2>();
+                List<Vector2> new_resources = new List<Vector2>();
+                Vector2 new_player = new Vector2();
+
+                Vector2 centered = player - Vector2.one * 0.5f;
+                Vector2 rotated = new Vector2(
+                       centered.x * matrix[0, 0] + centered.y * matrix[0, 1],
+                       centered.x * matrix[1, 0] + centered.y * matrix[1, 1]
+                    );
+                new_player = rotated + Vector2.one * 0.5f;
+
+                foreach (var ennemi in ennemies)
+                {
+                    centered = ennemi - Vector2.one * 0.5f;
+                    rotated = new Vector2(
+                           centered.x * matrix[0, 0] + centered.y * matrix[0, 1],
+                           centered.x * matrix[1, 0] + centered.y * matrix[1, 1]
+                        );
+                    new_ennemies.Add(rotated + Vector2.one * 0.5f);
+                }
+                foreach (var resource in resources)
+                {
+                    centered = resource - Vector2.one * 0.5f;
+                    rotated = new Vector2(
+                           centered.x * matrix[0, 0] + centered.y * matrix[0, 1],
+                           centered.x * matrix[1, 0] + centered.y * matrix[1, 1]
+                        );
+                    new_resources.Add(rotated + Vector2.one * 0.5f);
+                }
+
+                Register(new_raw, new_ennemies, new_resources, new_player);
             }
         }
     }

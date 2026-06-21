@@ -1,6 +1,9 @@
 using System.IO;
-using UnityEditor;
 using UnityEngine;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 [ExecuteInEditMode]
 public class CreateTexture2DArray : MonoBehaviour
@@ -40,11 +43,15 @@ public class CreateTexture2DArray : MonoBehaviour
             }
             Array.Apply(false);
 
+#if UNITY_EDITOR
             AssetDatabase.CreateAsset(Array, "Assets/TextureArrays/" + FileName + ".asset");
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
             Debug.Log("Texture2DArray saved at: " + FileName);
+#else
+            Debug.LogWarning("Saving Texture2DArray assets is only supported in the Editor.");
+#endif
 
             UPDATE = false;
         }

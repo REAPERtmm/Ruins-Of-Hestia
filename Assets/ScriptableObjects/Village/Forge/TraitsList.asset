@@ -1,0 +1,165 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d0ae9050048fe3489a580e32e0abd68, type: 3}
+  m_Name: TraitsList
+  m_EditorClassIdentifier: Assembly-CSharp::TraitList
+  Rules:
+  - Stat: 1
+    Cost:
+      Type: 2
+      Qte: 5
+    AllowFlat: 1
+    AllowPercent: 1
+    FlatMin: 0
+    FlatMax: 10
+    PercentMin: 2
+    PercentMax: 10
+  - Stat: 2
+    Cost:
+      Type: 2
+      Qte: 5
+    AllowFlat: 1
+    AllowPercent: 1
+    FlatMin: 0
+    FlatMax: 100
+    PercentMin: 2
+    PercentMax: 10
+  - Stat: 3
+    Cost:
+      Type: 0
+      Qte: 5
+    AllowFlat: 0
+    AllowPercent: 1
+    FlatMin: 0
+    FlatMax: 0
+    PercentMin: 2
+    PercentMax: 20
+  - Stat: 4
+    Cost:
+      Type: 4
+      Qte: 5
+    AllowFlat: 0
+    AllowPercent: 0
+    FlatMin: 0
+    FlatMax: 0
+    PercentMin: 2
+    PercentMax: 50
+  - Stat: 5
+    Cost:
+      Type: 1
+      Qte: 10
+    AllowFlat: 0
+    AllowPercent: 1
+    FlatMin: 0
+    FlatMax: 0
+    PercentMin: 2
+    PercentMax: 50
+  - Stat: 6
+    Cost:
+      Type: 1
+      Qte: 15
+    AllowFlat: 0
+    AllowPercent: 1
+    FlatMin: 0
+    FlatMax: 0
+    PercentMin: 2
+    PercentMax: 20
+  - Stat: 7
+    Cost:
+      Type: 0
+      Qte: 10
+    AllowFlat: 1
+    AllowPercent: 0
+    FlatMin: 0
+    FlatMax: 100
+    PercentMin: 0
+    PercentMax: 0
+  - Stat: 8
+    Cost:
+      Type: 0
+      Qte: 15
+    AllowFlat: 0
+    AllowPercent: 1
+    FlatMin: 0
+    FlatMax: 0
+    PercentMin: 25
+    PercentMax: 100
+  - Stat: 9
+    Cost:
+      Type: 0
+      Qte: 20
+    AllowFlat: 0
+    AllowPercent: 1
+    FlatMin: 0
+    FlatMax: 0
+    PercentMin: 25
+    PercentMax: 100
+  - Stat: 10
+    Cost:
+      Type: 4
+      Qte: 5
+    AllowFlat: 0
+    AllowPercent: 1
+    FlatMin: 0
+    FlatMax: 0
+    PercentMin: 2
+    PercentMax: 50
+  - Stat: 11
+    Cost:
+      Type: 4
+      Qte: 10
+    AllowFlat: 1
+    AllowPercent: 1
+    FlatMin: 0
+    FlatMax: 35
+    PercentMin: 10
+    PercentMax: 50
+  - Stat: 12
+    Cost:
+      Type: 4
+      Qte: 15
+    AllowFlat: 1
+    AllowPercent: 1
+    FlatMin: 1
+    FlatMax: 4
+    PercentMin: 2
+    PercentMax: 10
+  - Stat: 13
+    Cost:
+      Type: 1
+      Qte: 10
+    AllowFlat: 0
+    AllowPercent: 1
+    FlatMin: 0
+    FlatMax: 0
+    PercentMin: 2
+    PercentMax: 10
+  - Stat: 14
+    Cost:
+      Type: 1
+      Qte: 15
+    AllowFlat: 0
+    AllowPercent: 1
+    FlatMin: 0
+    FlatMax: 0
+    PercentMin: 5
+    PercentMax: 25
+  - Stat: 15
+    Cost:
+      Type: 0
+      Qte: 20
+    AllowFlat: 1
+    AllowPercent: 1
+    FlatMin: 1
+    FlatMax: 30
+    PercentMin: 15
+    PercentMax: 50

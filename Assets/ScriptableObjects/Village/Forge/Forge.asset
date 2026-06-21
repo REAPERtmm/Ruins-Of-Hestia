@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbd84752a9272dc4d9d49adfc472b5c0, type: 3}
+  m_Name: Forge
+  m_EditorClassIdentifier: Assembly-CSharp::BuildingDescriptor
+  Name: Forge
+  Prefab: {fileID: 8218779651801002831, guid: 07f10d41b123db9409af90806e0f4207, type: 3}
+  Fondation:
+    Width: 3
+    Height: 3
+  Visual:
+    Preview: {fileID: 21300000, guid: 0bd81b51e1c2c5f45a275f12393abdef, type: 3}
+    Active: {fileID: 2100000, guid: cae54cc0ad86323469112f976f2f1a40, type: 2}
+    Default: {fileID: 2100000, guid: 685c9d723f3b10b449d42aa097f6fd0e, type: 2}
+  GlobalBuildingData:
+    BuildingDuration: 4
+    BaseBuildingCount: 2
+    PerLevelBuildCountAdd: 
+    PerLevelUpgradeCost:
+    - Type: 0
+      Qte: 150
+    - Type: 1
+      Qte: 125

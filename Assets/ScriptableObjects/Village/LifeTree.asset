@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbd84752a9272dc4d9d49adfc472b5c0, type: 3}
+  m_Name: LifeTree
+  m_EditorClassIdentifier: Assembly-CSharp::BuildingDescriptor
+  Name: LifeTree
+  Prefab: {fileID: 8648564744090049965, guid: 8518ed99cac24d743a79e71693820462, type: 3}
+  Fondation:
+    Width: 3
+    Height: 3
+  Visual:
+    Preview: {fileID: 21300000, guid: 0388bd2c25e350844ae3bbf7e1a40893, type: 3}
+    Active: {fileID: 2100000, guid: d672a5713f86b1c4689830a8ffc3aa3d, type: 2}
+    Default: {fileID: 2100000, guid: 23df4701fa1dfd942b8256888ee4def2, type: 2}
+  GlobalBuildingData:
+    BuildingDuration: 0
+    BaseBuildingCount: 0
+    PerLevelBuildCountAdd: 
+    PerLevelUpgradeCost: []

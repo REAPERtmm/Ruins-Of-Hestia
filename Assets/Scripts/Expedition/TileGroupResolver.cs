@@ -2,13 +2,13 @@
 using UnityEngine;
 
 
-struct MeshRotation
+public struct MeshRotation
 {
     public Mesh[] Models;
     public int Rotation;
 }
 
-class TileGroupResolver
+public class TileGroupResolver
 {
     MeshTileGroup[] TileGroups;
     Dictionary<TileGroup, List<MeshRotation>> Resolver;
