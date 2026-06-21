@@ -11,9 +11,9 @@ public class FarmRecipeUI : MonoBehaviour
     [SerializeField] private Image      LockIcon;
 
     private FarmRecipe Recipe; 
-    private Farm Farm; 
+    private FarmUI Farm; 
 
-    public void Setup(FarmRecipe recipe, Farm farm)
+    public void Setup(FarmRecipe recipe, FarmUI farm)
     {
         
         Recipe = recipe;
@@ -36,8 +36,25 @@ public class FarmRecipeUI : MonoBehaviour
 
     }
 
+    public void Update()
+    {
+        if (Farm.GetFarm().Jobs.Count > 0)
+        {
+            LockIcon.gameObject.SetActive(true);
+            Button.interactable = false;
+        }
+        else
+        {
+            if (Recipe.IsUnlocked)
+            {
+                LockIcon.gameObject.SetActive(false);
+                Button.interactable = true;
+            }
+        }
+    }
+
     public void OnClick()
     { 
-        Farm.StartCraft(Recipe);
+        Farm.GetFarm().StartCraft(Recipe);
     }
 }

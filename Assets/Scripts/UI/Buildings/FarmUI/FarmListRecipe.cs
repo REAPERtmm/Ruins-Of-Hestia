@@ -33,7 +33,7 @@ public class FarmListRecipe : MonoBehaviour
         foreach (FarmRecipe recipe in Recipes)
         { 
             FarmRecipeUI ui = Instantiate(RecipePrefab, ContentParent);
-            ui.Setup(recipe, farmUI.GetFarm());
+            ui.Setup(recipe, farmUI);
         }
     }
 }

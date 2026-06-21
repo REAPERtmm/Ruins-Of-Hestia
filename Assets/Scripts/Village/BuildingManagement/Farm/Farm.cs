@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public class Farm : BuildingScript
 {
 
-    private readonly List<FarmJob> Jobs = new ();
+    public readonly List<FarmJob> Jobs = new ();
 
     public bool StartCraft(FarmRecipe recipe)
     {
