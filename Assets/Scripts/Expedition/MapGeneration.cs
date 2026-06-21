@@ -581,21 +581,21 @@ public class MapGeneration : MonoBehaviour
                         );
                 }
 
-                // for (int folliage = 0; folliage < FolliageCountPerRoom; ++folliage)
-                // {
-                //     Vector2Int TilePos;
-                //     do
-                //     {
-                //         TilePos = new Vector2Int(Random.Range(0, room.DualGridSize.x), Random.Range(0, room.DualGridSize.y));
-                //         Debug.Log("Current : \n" + room.DualGrid[TilePos.x, TilePos.y].TL + " | " + room.DualGrid[TilePos.x, TilePos.y].TR + "\n" + room.DualGrid[TilePos.x, TilePos.y].BL + " | " + room.DualGrid[TilePos.x, TilePos.y].BR);
-                //     }
-                //     while (room.DualGrid[TilePos.x, TilePos.y].IsFull() == false);
-                // 
-                //     CreateFolliage(
-                //             roomPosition + new Vector3(Factory.TileGroupScale.x * (TilePos.x + 0.5f), 0, Factory.TileGroupScale.y * (TilePos.y + 0.5f)),
-                //             in RoomObjects[x, y]
-                //     );
-                // }
+                for (int folliage = 0; folliage < FolliageCountPerRoom; ++folliage)
+                {
+                    Vector2Int TilePos;
+                    do
+                    {
+                        TilePos = new Vector2Int(Random.Range(0, room.DualGridSize.x), Random.Range(0, room.DualGridSize.y));
+                        Debug.Log("Current : \n" + room.DualGrid[TilePos.x, TilePos.y].TL + " | " + room.DualGrid[TilePos.x, TilePos.y].TR + "\n" + room.DualGrid[TilePos.x, TilePos.y].BL + " | " + room.DualGrid[TilePos.x, TilePos.y].BR);
+                    }
+                    while (room.DualGrid[TilePos.x, TilePos.y].IsFull() == false);
+                
+                    CreateFolliage(
+                            roomPosition + new Vector3(Factory.TileGroupScale.x * (TilePos.x + 0.5f), 0, Factory.TileGroupScale.y * (TilePos.y + 0.5f)),
+                            in RoomObjects[x, y]
+                    );
+                }
             }
         }
 
