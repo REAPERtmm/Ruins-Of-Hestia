@@ -180,7 +180,7 @@ public class EnnemiController : MonoBehaviour
 
         if(Combat.MELEE_RANGE * 0.9f > DistanceToTarget || Combat.IsAttacking)
         {
-            Combat.AttackClosest();
+            Combat.AttackClosest(.25f);
             Animation.SetFloat("Speed", 0.0f);
         }
         else

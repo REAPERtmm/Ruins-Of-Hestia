@@ -17,12 +17,19 @@ public class PlayerController : MonoBehaviour
     [SerializeField] EnnemiManager ManagerEnnemis;
     [SerializeField] ResourceManager ManagerResources;
     [SerializeField] Image HealthBar;
+    [SerializeField] AudioSource ExploreThemeSong;
+    [SerializeField] AudioSource FightThemeSong;
+    [SerializeField] AudioSource DashSFX;
     MapGeneration MapGenerationManager;
 
     [Header("Parameters")]
     [SerializeField] float Speed;
     [SerializeField] float DashSpeed;
     [SerializeField] float Acceleration;
+
+    AudioSource FootSteps;
+
+    float VolumeFightExplore = 0.0f;
 
     Quaternion LookingToward;
     Vector2 Velocity = Vector2.zero;
@@ -68,6 +75,8 @@ public class PlayerController : MonoBehaviour
         LookingToward = Quaternion.identity;
         if(INSTANCE == null)
             INSTANCE = this;
+
+        FootSteps = GetComponent<AudioSource>();
     }
 
     private void Start()
@@ -170,8 +179,19 @@ public class PlayerController : MonoBehaviour
                         last_attack_time = Time.time;
                 }
             }
-
+            if(distance < 12.0f)
+            {
+                VolumeFightExplore = Mathf.Clamp01(VolumeFightExplore + Time.deltaTime);
+            }
+            else
+            {
+                VolumeFightExplore = Mathf.Clamp01(VolumeFightExplore - Time.deltaTime);
+            }
         }
+        else
+        {
+            VolumeFightExplore = Mathf.Clamp01(VolumeFightExplore - Time.deltaTime);
+        } 
 
     }
 
@@ -214,15 +234,22 @@ public class PlayerController : MonoBehaviour
         {
             TowardedMove = new Vector2(Input.x, Input.y);
             CaliAnimator.SetBool("IsMoving", true);
+
+            if(FootSteps.isPlaying == false)
+            {
+                FootSteps.Play();
+            }
         }
         else
         {
             TowardedMove = Vector3.zero;
             CaliAnimator.SetBool("IsMoving", false);
+            FootSteps.Stop();
         }
 
         if (IsDashing && !IsDashLocked)
-        { 
+        {
+            DashSFX.Play();
             StartCoroutine(LockDashForSecond(.5f));
             DashVelocity = TowardedMove.normalized * DashSpeed;
         }
@@ -273,6 +300,8 @@ public class PlayerController : MonoBehaviour
         UpdateEnnemiTarget();
 
         HealthBar.fillAmount = Combat.HP / Combat.MAX_HP;
+        FightThemeSong.volume = VolumeFightExplore;
+        ExploreThemeSong.volume = 1.0f - VolumeFightExplore;
     }
 
     private void OnDrawGizmos()

@@ -100,7 +100,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52e9facb7c543714ab4b406ceeca1fd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CombatController
-  MeleeAttack: {fileID: 2684587428005364855, guid: d1f088fc1b61bc54c81a85c1d249c741, type: 3}
+  MeleeAttack: {fileID: 2684587428005364855, guid: 3faca084aaafbd04c862f0ed46dd79ac, type: 3}
   Helmet:
     Definition: {fileID: 11400000, guid: 3560f78fd8278824db0cfb5ee5d4c098, type: 2}
     UpgradeLevel: 0

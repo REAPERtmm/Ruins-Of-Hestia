@@ -379,7 +379,7 @@ public class CombatController : MonoBehaviour
             return false;
 
         Vector3 direction = ClosestTarget.position - transform.position;
-        AttackPlayed = StartCoroutine(DefaultMeleeAttackAnimation(direction.normalized, 0.1f, delay));
+        AttackPlayed = StartCoroutine(DefaultMeleeAttackAnimation(direction.normalized, 0.25f, delay));
         return true;
     }
 
@@ -391,7 +391,7 @@ public class CombatController : MonoBehaviour
         }
 
         Vector3 direction = target.position - transform.position;
-        AttackPlayed = StartCoroutine(DefaultMeleeAttackAnimation(direction.normalized, 0.1f, delay));
+        AttackPlayed = StartCoroutine(DefaultMeleeAttackAnimation(direction.normalized, 0.25f, delay));
         return true;
     }
 
